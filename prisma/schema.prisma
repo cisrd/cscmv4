@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model TSupplier {
+  id               Int                @id @default(autoincrement())
+  code             String?            @db.VarChar(50)
+  name             String             @db.VarChar(255)
+  address          String?            @db.VarChar(255)
+  email            String?            @db.VarChar(255)
+  phone            String?            @db.VarChar(255)
+  comment          String?            @db.VarChar(250)
+  status           Boolean            @default(false)
+  statusCash       Boolean            @default(false)
+  startDate        DateTime?          @db.Timestamp()
+  endDate          DateTime?          @db.Timestamp()
+  createdBy        String?            @db.VarChar(50)
+  createdAt        DateTime?          @default(now())
+  updatedAt        DateTime?          @updatedAt
+  updatedBy        String?            @db.VarChar(50)
+  TCountry         TCountry?          @relation(fields: [countryId], references: [id])
+  countryId        Int
+  TSupplierContact TSupplierContact[]
+}
+
+model TCountry {
+  id        Int         @id @default(autoincrement())
+  name      String      @db.VarChar(255)
+  code      String      @db.VarChar(10)
+  TSupplier TSupplier[]
+}
+
+model TSupplierContact {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(255)
+  job_title   String    @db.VarChar(255)
+  phone       String    @db.VarChar(255)
+  email       String    @db.VarChar(255)
+  comment     String    @db.Text
+  TSupplier   TSupplier @relation(fields: [TSupplierId], references: [id])
+  TSupplierId Int
+}
