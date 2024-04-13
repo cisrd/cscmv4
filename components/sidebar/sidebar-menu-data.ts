@@ -121,6 +121,20 @@ interface ISidebarItem {
         {
           name: "General",
           path: "/settings/general",
+          items: [
+            {
+              name: "General Settings",
+              path: "/settings/general/general-settings",
+            },
+            {
+              name: "Treeview",
+              path: "/settings/general/treeview",
+            },
+            {
+              name: "Cost Center",
+              path: "/settings/general/cost-center",
+            }
+          ],
         },
         {
           name: "Product",
