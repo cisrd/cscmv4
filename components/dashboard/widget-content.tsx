@@ -1,5 +1,7 @@
 "use client";
 
+
+
 const WidgetContent = ({ status, number, bgColor } :{status:string,number:string, bgColor:string} ) => {
   return (
     <div className={`flex flex-col justify-between border rounded-[8px] p-2 bg-orange-300 cursor-pointer
