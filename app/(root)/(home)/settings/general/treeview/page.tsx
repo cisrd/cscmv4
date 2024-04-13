@@ -11,7 +11,7 @@ const TreeView = () => {
             <div className="col-span-1 border-r-2 border-gray-300 overflow-auto">
               <div className='flex items-center justify-between p-1 border-b border-gray-300 mr-3 font-semibold'>
                 <p>Country ({itemsCountry.length}) </p> 
-                <Button variant={'outline'}>Newd</Button>
+                <Button variant={'outline'}>New</Button>
               </div>
               {itemsCountry.map(( country) => (
                 <CountryWidget key={country.name} country={country} />
