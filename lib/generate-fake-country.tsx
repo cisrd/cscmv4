@@ -9,9 +9,3 @@ const GenerateFakeCountry = ()=>{
     }
 
 }
-
-export const GenerateFakeCountries = (length)=>{
-    const country = []
-
-    
-}

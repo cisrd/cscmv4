@@ -16,7 +16,7 @@ export async function GET(request : any) {
 
     const allCountries = await prisma.tCountry.findMany({
         orderBy : {
-            name : "desc"
+            name : "asc"
         }
     });   
 
