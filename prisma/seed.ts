@@ -24,16 +24,61 @@ const generateUniqueCountries = (): Country[] => {
 async function main() {
 
     try {
-        await prisma.tCountry.deleteMany();
+// Seed the Country
+const country = await prisma.tTreeview.create({
+    data: {
+      name: 'KAZAKHSTAN',
+      adresse: '',
+      projectCode: '',
+      codeAnalytic: ''
+    },
+  });
 
-        const uniqueCountries = generateUniqueCountries();
+  // Seed the Project under the Country
+  const project = await prisma.tTreeview.create({
+    data: {
+      name: 'KAZ MINERALS',
+      parentId: country.id,
+      adresse: 'Project Address',
+      projectCode: 'P1',
+      codeAnalytic: '001-001'
+    },
+  });
 
-        const result = await prisma.tCountry.createMany({
-            data: uniqueCountries,
-            skipDuplicates: false, // This ensures that duplicates are not inserted
-        });
+  // Seed the Site under the Project
+  const site = await prisma.tTreeview.create({
+    data: {
+      name: 'AKTOGAY',
+      parentId: project.id,
+      adresse: '',
+      projectCode: 'S1',
+      codeAnalytic: '001-001-001'
+    },
+  });
 
-        console.log(`Countries created: ${result.count}`);
+  // Seed the Substore under the Site
+  const substore = await prisma.tTreeview.create({
+    data: {
+      name: 'Catering',
+      parentId: site.id,
+      adresse: '',
+      projectCode: 'SS1',
+      codeAnalytic: '001-001-001-001'
+    },
+  });
+
+  // Seed the Storage under the Substore
+  const storage = await prisma.tTreeview.create({
+    data: {
+      name: 'Storage',
+      parentId: substore.id,
+      adresse: 'Storage Address',
+      projectCode: 'ST1',
+      codeAnalytic: '001-001-001-001-001'
+    },
+  });
+
+  console.log('Seeding completed.');
     } catch (e) {
         console.error(e);
         process.exit(1);

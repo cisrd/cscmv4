@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "TTreeview" ALTER COLUMN "adresse" DROP NOT NULL,
+ALTER COLUMN "projectCode" DROP NOT NULL,
+ALTER COLUMN "codeAnalytic" DROP NOT NULL;

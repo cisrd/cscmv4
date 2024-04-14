@@ -1,48 +1,90 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ICoountry, itemsCountry } from "./treeview-data";
 import CountryWidget from "./country";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import axios from "axios";
+import { motion } from "framer-motion";
+import BeatLoader from "react-spinners/BeatLoader";
+
+interface TTreeview {
+  id: number;
+  name: string;
+  parentId: number | null;
+  isFm: boolean;
+  adresse: string;
+  projectCode: string;
+  codeAnalytic: string;
+  children?: TTreeview[];
+  parent?: TTreeview;
+}
+
+const variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+  exit: { opacity: 0 },
+};
 
 const TreeView = () => {
-  const [countries, setCountries] = useState<ICoountry[]>(itemsCountry);
+  const [dataTreeview, setDataTreeview] = useState<TTreeview[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<ICoountry | null>(
     null
   );
 
-  const handleSelectCountry = (selectedId: string) => {
-    const updatedCountries = countries.map((country) =>
-      country.name === selectedId
-        ? { ...country, selected: true }
-        : { ...country, selected: false }
-    );
-    setCountries(updatedCountries);
-    setSelectedCountry(
-      updatedCountries.find((country) => country.name === selectedId) || null
-    );
+  const fetchData = async () => {
+    const url = "/api/settings/general/treeview";
+    try {
+      const response = await axios.get(url);
+      const jsonData = await response.data;
+      setDataTreeview(jsonData);
+    } catch (error) {
+      setIsLoading(false);
+      return;
+    }
   };
+
+  useEffect(() => {
+    setTimeout(() => {
+      fetchData();
+    }, 500);
+  }, []);
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
       <div className="flex flex-1 bg-white p-3 rounded-s-sm">
         <div className="h-screen w-full grid grid-cols-5">
-          <div className="col-span-1 border-r-2 border-gray-300 overflow-hidden">
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            variants={variants}
+            transition={{ duration: 1 }}
+            className="col-span-1 border-r-2 border-gray-300 overflow-hidden"
+          >
             <div className="flex items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
-              <p>Country ({countries.length}) </p>
+              <p>Country ({dataTreeview?.length || 0}) </p>
               <Button variant={"outline"}>New</Button>
             </div>
+            {isLoading && (
+              <div className="flex items-center justify-center mt-5 mb-2">
+                <BeatLoader color="#253A79" />
+              </div>
+            )}
             <ScrollArea className=" h-[88%] pb-5 pr-1">
-              {countries.map((country) => (
-                <CountryWidget
-                  key={country.name}
-                  country={country}
-                  onSelectCountry={() => handleSelectCountry(country.name)}
-                />
-              ))}
+              {dataTreeview &&
+                dataTreeview.length > 0 &&
+                dataTreeview.map((data) => (
+                  <CountryWidget
+                    key={data.name}
+                    treeview={data}
+                    //onSelectCountry={() => handleSelectCountry(data.name)}
+                  />
+                ))}
             </ScrollArea>
-          </div>
+          </motion.div>
 
           <div
             className={`col-span-1 border-r-2 border-gray-300 overflow-hidden ${
@@ -50,20 +92,9 @@ const TreeView = () => {
             }`}
           >
             <div className="flex items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
-              <p>Project ({selectedCountry?.project?.length}) </p>
               <Button variant={"outline"}>New</Button>
             </div>
-            <ul>
-              {selectedCountry?.project?.length ? (
-                selectedCountry.project.map((project, index) => (
-                  <li key={index} className="p-2 border-b border-gray-200">
-                    <strong>{project.name}</strong>
-                  </li>
-                ))
-              ) : (
-                <li className="p-2">No projects found for this country.</li>
-              )}
-            </ul>
+            <li className="p-2">No projects found for this country.</li>
           </div>
           <div className="col-span-1 border-r-2 border-gray-300 overflow-auto  hidden">
             site

@@ -51,9 +51,9 @@ model TTreeview {
   name         String
   parentId     Int?
   isFm         Boolean     @default(false)
-  adresse      String
-  projectCode  String
-  codeAnalytic String      @db.VarChar(20)
+  adresse      String?
+  projectCode  String?
+  codeAnalytic String?     @db.VarChar(20)
   children     TTreeview[] @relation("TreeviewToTreeview")
   parent       TTreeview?  @relation("TreeviewToTreeview", fields: [parentId], references: [id])
 }
