@@ -47,6 +47,8 @@ const TreeView = () => {
     }
   };
 
+  const handleSelectCountry = (selectedId: string) => {};
+
   useEffect(() => {
     setTimeout(() => {
       fetchData();
