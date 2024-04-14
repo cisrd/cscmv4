@@ -7,7 +7,25 @@ export async function GET(request : any) {
 
     const allTreeview= await prisma.tTreeview.findMany({
         where: { parentId: null },
-        include: { children: true },
+        include: {
+            children: {
+              include: {
+                children: {
+                  include: {
+                    children: {
+                      include: {
+                        children: {
+                          include: {
+                            children: true
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
     });   
      return NextResponse.json(allTreeview);       
 

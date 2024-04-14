@@ -39,6 +39,7 @@ const TreeView = () => {
     try {
       const response = await axios.get(url);
       const jsonData = await response.data;
+      console.log(jsonData);
       setDataTreeview(jsonData);
     } catch (error) {
       setIsLoading(false);
