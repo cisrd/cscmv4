@@ -26,6 +26,7 @@ const config = {
           background: "#E2E2F7",
           iconColor: "#636c80",
           bgLogo: "#2E3991",
+          
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
