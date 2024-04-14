@@ -1,5 +1,6 @@
 export interface ICoountry {
     name: string;
+    parentId?: number;
     selected?: boolean;
     project?: IProject[];
   }
@@ -8,7 +9,7 @@ export  interface IProject {
     name: string;
   }
   
-  export const itemsCountry: ICoountry[] = [
+export const itemsCountry: ICoountry[] = [
     {
       name : "Kazakhstan",
       selected : false,
