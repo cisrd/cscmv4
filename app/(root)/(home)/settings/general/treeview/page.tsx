@@ -30,7 +30,7 @@ const TreeView = () => {
         <div className="h-screen w-full grid grid-cols-5">
           <div className="col-span-1 border-r-2 border-gray-300 overflow-hidden">
             <div className="flex items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
-              <p>Country ({itemsCountry.length}) </p>
+              <p>Country ({countries.length}) </p>
               <Button variant={"outline"}>New</Button>
             </div>
             <ScrollArea className=" h-[88%] pb-5 pr-1">
@@ -45,11 +45,14 @@ const TreeView = () => {
           </div>
 
           <div
-            className={`col-span-1 border-r-2 border-gray-300 overflow-auto ${
+            className={`col-span-1 border-r-2 border-gray-300 overflow-hidden ${
               !selectedCountry && "hidden"
             }`}
           >
-            project
+            <div className="flex items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
+              <p>Project ({selectedCountry?.project?.length}) </p>
+              <Button variant={"outline"}>New</Button>
+            </div>
             <ul>
               {selectedCountry?.project?.length ? (
                 selectedCountry.project.map((project, index) => (
