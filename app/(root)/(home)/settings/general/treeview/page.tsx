@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import CountryWidget from "./country";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import axios from "axios";
 import { motion } from "framer-motion";
@@ -11,11 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Check, SquareX } from "lucide-react";
 import { saveTreeviewName } from "./action";
 import toast from "react-hot-toast";
-import ProjectWidget from "./project";
-import SiteWidget from "./site";
-import SubstoreWidget from "./substore";
-import ProductionCenterWidget from "./production-center";
-import StorageWidget from "./storage";
+import TreeviewWidget from "./treeview-widget";
 
 interface TTreeview {
   id: number;
@@ -45,6 +40,7 @@ const TreeView = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [savingCountry, setSavingCountry] = useState(false);
   const [savingProject, setSavingProject] = useState(false);
+  const [savingSite, setSavingSite] = useState(false);
   const [isNewCountry, setIsNewCountry] = useState(false);
   const [isNewProject, setIsNewProject] = useState(false);
   const [isNewSite, setIsNewSite] = useState(false);
@@ -163,23 +159,92 @@ const TreeView = () => {
       parentID: parentIDString ? parseInt(parentIDString as string) : undefined,
     };
 
-    const response = await saveTreeviewName(newData, 2);
+    try {
+      const response = await saveTreeviewName(newData, 2);
+      if (response?.error) {
+        toast.error(response.error);
+      } else {
+        toast.success("Project created successfully!");
+        if (selectedCountry) {
+          setSelectedCountry((prevState) => {
+            if (!prevState) return prevState;
 
-    if (response?.error) {
-      toast.error(response.error);
-      setSavingProject(false);
-    } else {
-      toast.success("Project have been created with successfully!");
-      setSavingProject(false);
-      setIsNewProject(false);
-      fetchData().then(() => {
-        if (parentID) {
-          console.log("Working");
-          handleSelectProject(parentID);
+            const newProject = response.data;
+
+            if (!newProject) return prevState;
+
+            return {
+              ...prevState,
+              children: prevState.children
+                ? [...prevState.children, newProject]
+                : [newProject],
+            };
+          });
         }
-      });
+          setIsNewProject(false);
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.log(error.message); // Safe to access `message`
+      } else {
+        console.log("An unexpected error occurred");
+      }
+    } finally {
+      setSavingProject(false);
+      fetchData();
     }
   };
+
+  const actionSaveSite = async (formData: FormData) => {
+    setSavingProject(true);
+
+    const projectName = formData.get("project");
+    const parentIDString = formData.get("parentID");
+    const parentID = parentIDString
+      ? parseInt(parentIDString as string)
+      : undefined;
+
+    const newData = {
+      name: typeof projectName === "string" ? projectName : undefined,
+      parentID: parentIDString ? parseInt(parentIDString as string) : undefined,
+    };
+
+    try {
+      const response = await saveTreeviewName(newData, 2);
+      if (response?.error) {
+        toast.error(response.error);
+      } else {
+        toast.success("Project created successfully!");
+        if (selectedCountry) {
+          setSelectedProject((prevState) => {
+            if (!prevState) return prevState;
+
+            const newProject = response.data;
+
+            if (!newProject) return prevState;
+
+            return {
+              ...prevState,
+              children: prevState.children
+                ? [...prevState.children, newProject]
+                : [newProject],
+            };
+          });
+        }
+          setIsNewSite(false);
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.log(error.message); // Safe to access `message`
+      } else {
+        console.log("An unexpected error occurred");
+      }
+    } finally {
+      setSavingSite(false);
+      fetchData();
+    }
+  };
+
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
@@ -244,13 +309,13 @@ const TreeView = () => {
               {dataTreeview &&
                 dataTreeview.length > 0 &&
                 dataTreeview.map((data) => (
-                  <CountryWidget
+                  <TreeviewWidget
                     key={data.name}
                     treeview={data}
                     selectedBool={
                       selectedCountry?.id === data.id ? true : false
                     }
-                    onSelectCountry={() => handleSelectCountry(data.id)}
+                    onSelectTreeview={() => handleSelectCountry(data.id)}
                   />
                 ))}
             </ScrollArea>
@@ -315,11 +380,11 @@ const TreeView = () => {
                 selectedCountry.children &&
                 selectedCountry.children.length > 0 &&
                 selectedCountry.children.map((project) => (
-                  <ProjectWidget
+                  <TreeviewWidget
                     key={project.name}
                     treeview={project}
                     selectedBool={selectedProject?.id === project.id}
-                    onSelectProject={() => handleSelectProject(project.id)}
+                    onSelectTreeview={() => handleSelectProject(project.id)}
                   />
                 ))}
             </ScrollArea>
@@ -332,20 +397,63 @@ const TreeView = () => {
               !selectedProject && "hidden"
             }`}
           >
-            <div className="flex items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
-              <p>Site ({selectedProject?.children?.length || 0})</p>
-              <Button variant={"outline"}>New</Button>
+<div className="items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
+              {isNewSite ? (
+                <form action={actionSaveSite}>
+                  <input
+                    type="hidden"
+                    name="parentID"
+                    value={selectedProject?.id}
+                  ></input>
+                  <div className="flex  space-x-2 items-center justify-end w-full">
+                    <Input
+                      name="project"
+                      type="text"
+                      placeholder="Site name..."
+                      className="w-full h-[30px] focus:ring-0 focus-visible:ring-1 capitalize"
+                    />
+                    <div className="ml-auto flex items-center">
+                      <button type="submit" className="icon-button">
+                        <Check
+                          height={25}
+                          width={25}
+                          className="cursor-pointer justify-end hover:bg-sidebar-background mr-1"
+                        />
+                      </button>
+                      <SquareX
+                        height={25}
+                        width={25}
+                        onClick={() => setIsNewProject(false)}
+                        className="cursor-pointer hover:bg-sidebar-background"
+                      />
+                    </div>
+                  </div>
+                </form>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between font-semibold">
+                    <p>Project ({selectedProject?.children?.length || 0})</p>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsNewSite(true)}
+                    >
+                      New
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
+
             <ScrollArea className=" h-[88%] pb-5 pr-1">
               {selectedProject &&
                 selectedProject.children &&
                 selectedProject.children.length > 0 &&
                 selectedProject.children.map((site) => (
-                  <SiteWidget
+                  <TreeviewWidget
                     key={site.name}
                     treeview={site}
                     selectedBool={selectedSite?.id === site.id}
-                    onSelectSite={() => handleSelectSite(site.id)}
+                    onSelectTreeview={() => handleSelectSite(site.id)}
                   />
                 ))}
             </ScrollArea>
@@ -367,11 +475,11 @@ const TreeView = () => {
                 selectedSite.children &&
                 selectedSite.children.length > 0 &&
                 selectedSite.children.map((substore) => (
-                  <SubstoreWidget
+                  <TreeviewWidget
                     key={substore.name}
                     treeview={substore}
                     selectedBool={selectedSubstore?.id === substore.id}
-                    onSelectSubstore={() => handleSelectSubstore(substore.id)}
+                    onSelectTreeview={() => handleSelectSubstore(substore.id)}
                   />
                 ))}
             </ScrollArea>
@@ -398,13 +506,13 @@ const TreeView = () => {
                 selectedSubstore.children
                   .filter((productionCenter) => productionCenter.level === 5)
                   .map((productionCenter) => (
-                    <ProductionCenterWidget
+                    <TreeviewWidget
                       key={productionCenter.name}
                       treeview={productionCenter}
                       selectedBool={
                         selectedSubstore?.id === productionCenter.id
                       }
-                      onSelectProductionCenter={() =>
+                      onSelectTreeview={() =>
                         handleSelectProductionCenter(productionCenter.id)
                       }
                     />
@@ -428,11 +536,11 @@ const TreeView = () => {
                 selectedSubstore.children
                   .filter((storage) => storage.level === 6)
                   .map((storage) => (
-                    <StorageWidget
+                    <TreeviewWidget
                       key={storage.name}
                       treeview={storage}
                       selectedBool={selectedSubstore?.id === storage.id}
-                      onSelectStorage={() =>
+                      onSelectTreeview={() =>
                         handleSelectProductionCenter(storage.id)
                       }
                     />

@@ -5,9 +5,7 @@ import { treeviewSchema } from "./zod.treeview.schema";
 import { revalidatePath } from "next/cache";
 
 export const saveTreeviewName  = async (treeviewName : any,  levelNumber : number) => {
-
   
-
     const result = treeviewSchema.safeParse(treeviewName);
     if (!result.success) {
       let errorMessage = "";
@@ -34,13 +32,20 @@ export const saveTreeviewName  = async (treeviewName : any,  levelNumber : numbe
           },
         });
         revalidatePath("/settings/general/treeview");
+        return { 
+          error: null,
+          data : createdTreeview
+        };
+      } catch (errorCatch: unknown) {
+        let errorMessage = "Error please contact the support!";
+        
+        if (errorCatch instanceof Error) {
+          errorMessage = `Database error: ${errorCatch.message}`;
+        }
+      
         return {
-            error : null
-          };
-      } catch (errorCatch) {
-        return {
-            error : "Error please contact the support!"
-          };
+          error: errorMessage
+        };
       }
 
 };

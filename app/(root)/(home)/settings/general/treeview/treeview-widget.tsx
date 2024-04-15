@@ -3,17 +3,17 @@
 import { Pencil } from "lucide-react";
 import { TTreeview } from "@prisma/client";
 
-interface SubstoreWidgetProps {
+interface TreeviewWidgetProps {
   key: string;
   treeview: TTreeview;
   selectedBool: boolean;
-  onSelectSubstore: () => void;
+  onSelectTreeview: () => void;
 }
 
-const SubstoreWidget: React.FC<SubstoreWidgetProps> = ({
+const TreeviewWidget: React.FC<TreeviewWidgetProps> = ({
   treeview,
   selectedBool,
-  onSelectSubstore,
+  onSelectTreeview,
 }) => {
   return (
     <div
@@ -21,7 +21,7 @@ const SubstoreWidget: React.FC<SubstoreWidgetProps> = ({
     cursor-pointer min-h-[50px] text-sidebar-active font-semibold mt-3 mr-3 relative hover:bg-sidebar-background
     ${selectedBool ? "bg-sidebar-background" : "bg-slate-100 "}
     `}
-      onClick={onSelectSubstore}
+      onClick={onSelectTreeview}
     >
       <p>{treeview.name}</p>
       <Pencil className="hidden group-hover:block h-5 w-5 text-gray-600 ml-5" />
@@ -29,4 +29,4 @@ const SubstoreWidget: React.FC<SubstoreWidgetProps> = ({
   );
 };
 
-export default SubstoreWidget;
+export default TreeviewWidget;
