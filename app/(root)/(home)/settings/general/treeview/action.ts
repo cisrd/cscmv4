@@ -4,9 +4,11 @@ import { prisma } from "@/lib/prisma";
 import { treeviewSchema } from "./zod.treeview.schema";
 import { revalidatePath } from "next/cache";
 
-export const saveCountryName  = async (countryName : any) => {
+export const saveTreeviewName  = async (treeviewName : any,  levelNumber : number) => {
 
-    const result = treeviewSchema.safeParse(countryName);
+  
+
+    const result = treeviewSchema.safeParse(treeviewName);
     if (!result.success) {
       let errorMessage = "";
       result.error.issues.forEach((issue) => {
@@ -20,13 +22,14 @@ export const saveCountryName  = async (countryName : any) => {
     }
 
     try {
-        const createdCountry = await prisma.tTreeview.create({
+        const createdTreeview = await prisma.tTreeview.create({
           data: {
             name: result.data.name,
-            parentId : null,
+            parentId : result.data.parentID,
+            level: levelNumber,
             isFm: false,
-            adresse: "",  // Defaulting to an empty string if not provided
-            projectCode:  "",  // Defaulting to an empty string if not provided
+            adresse: "",  
+            projectCode:  "", 
             codeAnalytic: "",
           },
         });
@@ -41,3 +44,6 @@ export const saveCountryName  = async (countryName : any) => {
       }
 
 };
+
+
+

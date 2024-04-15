@@ -9,7 +9,7 @@ import { motion } from "framer-motion";
 import BeatLoader from "react-spinners/BeatLoader";
 import { Input } from "@/components/ui/input";
 import { Check, SquareX } from "lucide-react";
-import { saveCountryName } from "./action";
+import { saveTreeviewName } from "./action";
 import toast from "react-hot-toast";
 import ProjectWidget from "./project";
 import SiteWidget from "./site";
@@ -44,6 +44,7 @@ const TreeView = () => {
   const [dataTreeview, setDataTreeview] = useState<TTreeview[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [savingCountry, setSavingCountry] = useState(false);
+  const [savingProject, setSavingProject] = useState(false);
   const [isNewCountry, setIsNewCountry] = useState(false);
   const [isNewProject, setIsNewProject] = useState(false);
   const [isNewSite, setIsNewSite] = useState(false);
@@ -89,6 +90,7 @@ const TreeView = () => {
   };
 
   const handleSelectProject = (selectedId: number) => {
+    console.log();
     const selected = selectedCountry?.children?.find(
       (project) => project.id === selectedId
     ) as TTreeview;
@@ -134,16 +136,48 @@ const TreeView = () => {
       name: formData.get("country"),
     };
 
-    const response = await saveCountryName(newCountry);
+    const response = await saveTreeviewName(newCountry, 1);
 
     if (response?.error) {
       toast.error(response.error);
       setSavingCountry(false);
     } else {
-      toast.success("Supplier have been created with successfully!");
+      toast.success("Country have been created with successfully!");
       setSavingCountry(false);
       setIsNewCountry(false);
       fetchData();
+    }
+  };
+
+  const actionSaveProject = async (formData: FormData) => {
+    setSavingProject(true);
+
+    const projectName = formData.get("project");
+    const parentIDString = formData.get("parentID");
+    const parentID = parentIDString
+      ? parseInt(parentIDString as string)
+      : undefined;
+
+    const newData = {
+      name: typeof projectName === "string" ? projectName : undefined,
+      parentID: parentIDString ? parseInt(parentIDString as string) : undefined,
+    };
+
+    const response = await saveTreeviewName(newData, 2);
+
+    if (response?.error) {
+      toast.error(response.error);
+      setSavingProject(false);
+    } else {
+      toast.success("Project have been created with successfully!");
+      setSavingProject(false);
+      setIsNewProject(false);
+      fetchData().then(() => {
+        if (parentID) {
+          console.log("Working");
+          handleSelectProject(parentID);
+        }
+      });
     }
   };
 
@@ -229,9 +263,51 @@ const TreeView = () => {
               !selectedCountry && "hidden"
             }`}
           >
-            <div className="flex items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
-              <p>Project ({selectedCountry?.children?.length || 0})</p>
-              <Button variant={"outline"}>New</Button>
+            <div className="items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
+              {isNewProject ? (
+                <form action={actionSaveProject}>
+                  <input
+                    type="hidden"
+                    name="parentID"
+                    value={selectedCountry?.id}
+                  ></input>
+                  <div className="flex  space-x-2 items-center justify-end w-full">
+                    <Input
+                      name="project"
+                      type="text"
+                      placeholder="Project name..."
+                      className="w-full h-[30px] focus:ring-0 focus-visible:ring-1 capitalize"
+                    />
+                    <div className="ml-auto flex items-center">
+                      <button type="submit" className="icon-button">
+                        <Check
+                          height={25}
+                          width={25}
+                          className="cursor-pointer justify-end hover:bg-sidebar-background mr-1"
+                        />
+                      </button>
+                      <SquareX
+                        height={25}
+                        width={25}
+                        onClick={() => setIsNewProject(false)}
+                        className="cursor-pointer hover:bg-sidebar-background"
+                      />
+                    </div>
+                  </div>
+                </form>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between font-semibold">
+                    <p>Project ({selectedCountry?.children?.length || 0})</p>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsNewProject(true)}
+                    >
+                      New
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
 
             <ScrollArea className=" h-[88%] pb-5 pr-1">
@@ -303,7 +379,6 @@ const TreeView = () => {
           {/* End Substore View */}
 
           {/* Productioo Center View */}
-
           <div className="flex flex-col h-screen">
             <div
               className={`flex-1 pl-2 border-r-2 border-gray-300 overflow-hidden ${
@@ -364,7 +439,6 @@ const TreeView = () => {
                   ))}
             </div>
           </div>
-
           {/* End Productioo Center View */}
         </div>
       </div>
