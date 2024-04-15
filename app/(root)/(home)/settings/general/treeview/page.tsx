@@ -36,7 +36,11 @@ const TreeView = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [savingCountry, setSavingCountry] = useState(false);
   const [isNewCountry, setIsNewCountry] = useState(false);
+  const [isNewProject, setIsNewProject] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<TTreeview | null>(
+    null
+  );
+  const [selectedProject, setSelectedProject] = useState<TTreeview | null>(
     null
   );
 
@@ -53,7 +57,9 @@ const TreeView = () => {
   };
 
   const handleSelectCountry = (selectedId: number) => {
-    const selected = dataTreeview.find(country => country.id === selectedId) as TTreeview;
+    const selected = dataTreeview.find(
+      (country) => country.id === selectedId
+    ) as TTreeview;
     setSelectedCountry(selected);
   };
 
@@ -63,14 +69,14 @@ const TreeView = () => {
     }, 500);
   }, []);
 
-  const actionSaveCountry = async (formData : FormData) => {
-    setSavingCountry(true)
+  const actionSaveCountry = async (formData: FormData) => {
+    setSavingCountry(true);
 
     const newCountry = {
-      name : formData.get("country"),
-    }
+      name: formData.get("country"),
+    };
 
-    const response = await saveCountryName(newCountry)
+    const response = await saveCountryName(newCountry);
 
     if (response?.error) {
       toast.error(response.error);
@@ -81,8 +87,6 @@ const TreeView = () => {
       setIsNewCountry(false);
       fetchData();
     }
-
-
   };
 
   return (
@@ -97,41 +101,46 @@ const TreeView = () => {
             transition={{ duration: 1 }}
             className="col-span-1 border-r-2 border-gray-300 overflow-hidden"
           >
-            <div className="flex items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
-            {isNewCountry ? (
-              <form action={actionSaveCountry}>
-              <div className="flex flex-1 justify-between pb-2">
-
-                <Input
-                  name="country"
-                  type="text"
-                  placeholder="Country name..."
-                  className="w-full h-[30px] focus:ring-0 focus-visible:ring-1 capitalize"
-                />
-                <div className="flex items-center justify-between ml-2">      
-                   <button type="submit" className="icon-button">          
-                  <Check 
-                  height={25} width={25} 
-                  className="cursor-pointer hover:bg-sidebar-background mr-1"
-                  />
-                  </button>
-                  <SquareX height={25} width={25} 
-                  onClick={() => setIsNewCountry(false)} 
-                  className="cursor-pointer hover:bg-sidebar-background"
-                  />
+            <div className="flexw-full  items-center justify-between p-1 border-b border-gray-200 mr-3 font-semibold">
+              {isNewCountry ? (
+                <form action={actionSaveCountry}>
+                  <div className="flex  space-x-2 items-center justify-end w-full">
+                    {/* Help me I want input 100%*/}
+                    <Input
+                      name="country"
+                      type="text"
+                      placeholder="Country name..."
+                      className="w-full h-[30px] focus:ring-0 focus-visible:ring-1 capitalize"
+                    />
+                    {/* Help me here to push this div on the right */}
+                    <div className="ml-auto flex items-center">
+                      <button type="submit" className="icon-button">
+                        <Check
+                          height={25}
+                          width={25}
+                          className="cursor-pointer justify-end hover:bg-sidebar-background mr-1"
+                        />
+                      </button>
+                      <SquareX
+                        height={25}
+                        width={25}
+                        onClick={() => setIsNewCountry(false)}
+                        className="cursor-pointer hover:bg-sidebar-background"
+                      />
+                    </div>
                   </div>
-                  
-              </div>
-              </form>
-            ) : (
-              <>
-                <p>Country ({dataTreeview?.length || 0})</p>
-                <Button 
-                variant="outline"
-                onClick={() => setIsNewCountry(true)} 
-                >New</Button>
-              </>
-            )}
+                </form>
+              ) : (
+                <>
+                  <p>Country ({dataTreeview?.length || 0})</p>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsNewCountry(true)}
+                  >
+                    New
+                  </Button>
+                </>
+              )}
             </div>
             {isLoading && (
               <div className="flex items-center justify-center mt-5 mb-2">
@@ -145,7 +154,9 @@ const TreeView = () => {
                   <CountryWidget
                     key={data.name}
                     treeview={data}
-                    selectedBool={selectedCountry?.id === data.id ? true : false}
+                    selectedBool={
+                      selectedCountry?.id === data.id ? true : false
+                    }
                     onSelectCountry={() => handleSelectCountry(data.id)}
                   />
                 ))}
@@ -158,7 +169,7 @@ const TreeView = () => {
             }`}
           >
             <div className="flex items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
-            <p>Project ({selectedCountry?.children?.length || 0})</p>
+              <p>Project ({selectedCountry?.children?.length || 0})</p>
               <Button variant={"outline"}>New</Button>
             </div>
 
