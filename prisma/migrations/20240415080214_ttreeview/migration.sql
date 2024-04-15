@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "TTreeview" ADD COLUMN     "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN     "createdBy" VARCHAR(50),
+ADD COLUMN     "updatedAt" TIMESTAMP(3),
+ADD COLUMN     "updatedBy" VARCHAR(50);

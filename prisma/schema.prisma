@@ -50,10 +50,15 @@ model TTreeview {
   id           Int         @id @default(autoincrement())
   name         String
   parentId     Int?
+  level        Int?
   isFm         Boolean     @default(false)
   adresse      String?
   projectCode  String?
   codeAnalytic String?     @db.VarChar(20)
+  createdBy    String?     @db.VarChar(50)
+  createdAt    DateTime?   @default(now())
+  updatedAt    DateTime?   @updatedAt
+  updatedBy    String?     @db.VarChar(50)
   children     TTreeview[] @relation("TreeviewToTreeview")
   parent       TTreeview?  @relation("TreeviewToTreeview", fields: [parentId], references: [id])
 }
