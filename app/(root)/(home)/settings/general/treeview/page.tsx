@@ -29,6 +29,26 @@ interface TTreeview {
   parent?: TTreeview;
 }
 
+interface IState {
+  dataTreeview: TTreeview[];
+  selectedCountry: TTreeview | null;
+  selectedProject: TTreeview | null;
+  selectedSite: TTreeview | null;
+  selectedSubstore: TTreeview | null;
+  selectedStorage: TTreeview | null;
+  selectedProductionCenter: TTreeview | null;
+}
+
+const initialState: IState = {
+  dataTreeview: [],
+  selectedCountry: null,
+  selectedProject: null,
+  selectedSite: null,
+  selectedSubstore: null,
+  selectedStorage: null,
+  selectedProductionCenter: null,
+};
+
 const variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1 },
@@ -36,6 +56,7 @@ const variants = {
 };
 
 const TreeView = () => {
+
   const [treeviewState, setTreeviewState] = useState({
     isLoading: false,
     savingCountry: false,
@@ -49,18 +70,8 @@ const TreeView = () => {
     isNewProductionCenter: false,
   });
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [savingCountry, setSavingCountry] = useState(false);
-  const [savingProject, setSavingProject] = useState(false);
-  const [savingSite, setSavingSite] = useState(false);
-  const [savingSubstore, setSavingSubstore] = useState(false);
-  const [savingProductionCenter, setSavingProductionCenter] = useState(false);
-  const [savingStorage, setSavingStorage] = useState(false);
+  const [treeviewStateData, setTreeviewStateData] = useState<IState>(initialState);
 
-  const [dataTreeview, setDataTreeview] = useState<TTreeview[]>([]);
-  const [selectedCountry, setSelectedCountry] = useState<TTreeview | null>(
-    null
-  );
   const [selectedProject, setSelectedProject] = useState<TTreeview | null>(
     null
   );
@@ -79,7 +90,7 @@ const TreeView = () => {
       const response = await axios.get<TTreeview[]>(
         "/api/settings/general/treeview"
       );
-      setDataTreeview(response.data);
+      setTreeviewStateData({...treeviewStateData, dataTreeview: response.data });
     } catch (error: any) {
       if (axios.isAxiosError(error)) {
         console.error("API Error:", error.message);
@@ -90,18 +101,18 @@ const TreeView = () => {
   };
 
   const handleSelectCountry = (selectedId: number) => {
-    const selected = dataTreeview.find(
+    const selected = treeviewStateData.dataTreeview.find(
       (project) => project.id === selectedId
     ) as TTreeview;
     setSelectedProject(null);
     setSelectedSite(null);
     setSelectedSubstore(null);
-    setSelectedCountry(selected);
+    setTreeviewStateData({...treeviewStateData, selectedCountry: selected });
   };
 
   const handleSelectProject = (selectedId: number) => {
     console.log();
-    const selected = selectedCountry?.children?.find(
+    const selected = treeviewStateData.selectedCountry?.children?.find(
       (project) => project.id === selectedId
     ) as TTreeview;
     setSelectedSite(null);
@@ -140,7 +151,6 @@ const TreeView = () => {
   }, []);
 
   const actionSaveCountry = async (formData: FormData) => {
-    setSavingCountry(true);
 
     const newCountry = {
       name: formData.get("country"),
@@ -150,18 +160,14 @@ const TreeView = () => {
 
     if (response?.error) {
       toast.error(response.error);
-      setSavingCountry(false);
     } else {
       toast.success("Country have been created with successfully!");
-      setSavingCountry(false);
       setTreeviewState({ ...treeviewState, isNewCountry: false });
-      //setIsNewCountry(false);
       fetchData();
     }
   };
 
   const actionSaveProject = async (formData: FormData) => {
-    setSavingProject(true);
 
     const projectName = formData.get("project");
     const parentIDString = formData.get("parentID");
@@ -180,23 +186,31 @@ const TreeView = () => {
         toast.error(response.error);
       } else {
         toast.success("Project created successfully!");
-        if (selectedCountry) {
-          setSelectedCountry((prevState) => {
-            if (!prevState) return prevState;
+        if (treeviewStateData.selectedCountry) {
+          
+          setTreeviewStateData(prevState => {
+            if (!prevState.selectedCountry) return prevState;
 
-            const newProject = response.data;
+            const newProject = response.data; 
 
             if (!newProject) return prevState;
-
+    
             return {
               ...prevState,
-              children: prevState.children
-                ? [...prevState.children, newProject]
-                : [newProject],
+              selectedCountry: {
+                ...prevState.selectedCountry,
+                children: prevState.selectedCountry.children
+                  ? [...prevState.selectedCountry.children, newProject]
+                  : [newProject]
+              }
             };
           });
         }
         setTreeviewState({ ...treeviewState, isNewProject: false });
+        console.log(treeviewStateData.selectedCountry)
+        console.log(treeviewStateData.dataTreeview)
+        fetchData();
+        //handleSelectCountry(treeviewStateData.selectedCountry?.parentId)
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -205,15 +219,13 @@ const TreeView = () => {
         console.log("An unexpected error occurred");
       }
     } finally {
-      setSavingProject(false);
-      fetchData();
+      
     }
   };
 
   const actionSaveSite = async (formData: FormData) => {
-    setSavingSite(true);
 
-    const projectName = formData.get("substore");
+    const projectName = formData.get("site");
     const parentIDString = formData.get("parentID");
     const parentID = parentIDString
       ? parseInt(parentIDString as string)
@@ -230,7 +242,7 @@ const TreeView = () => {
         toast.error(response.error);
       } else {
         toast.success("Site created successfully!");
-        if (selectedCountry) {
+        if (treeviewStateData.selectedCountry) {
           setSelectedProject((prevState) => {
             if (!prevState) return prevState;
 
@@ -255,13 +267,11 @@ const TreeView = () => {
         console.log("An unexpected error occurred");
       }
     } finally {
-      setSavingSite(false);
       fetchData();
     }
   };
 
   const actionSaveSubstore = async (formData: FormData) => {
-    setSavingSubstore(true);
 
     const substoreName = formData.get("substore");
     const parentIDString = formData.get("parentID");
@@ -280,7 +290,7 @@ const TreeView = () => {
         toast.error(response.error);
       } else {
         toast.success("Sub-store created successfully!");
-        if (selectedCountry) {
+        if (treeviewStateData.selectedCountry) {
           const newSubstore = response.data;
 
           setSelectedSite((prevState) => {
@@ -306,7 +316,104 @@ const TreeView = () => {
         console.log("An unexpected error occurred");
       }
     } finally {
-      setSavingSubstore(false);
+      fetchData();
+    }
+  };
+
+  const actionSaveProductionCenter = async (formData: FormData) => {
+
+    const productionCenterName = formData.get("production-center");
+    const parentIDString = formData.get("parentID");
+    const parentID = parentIDString
+      ? parseInt(parentIDString as string)
+      : undefined;
+
+    const newData = {
+      name: typeof productionCenterName === "string" ? productionCenterName : undefined,
+      parentID: parentIDString ? parseInt(parentIDString as string) : undefined,
+    };
+
+    try {
+      const response = await saveTreeviewName(newData, 5);
+      if (response?.error) {
+        toast.error(response.error);
+      } else {
+        toast.success("Production Center created with successfully!");
+        if (treeviewStateData.selectedCountry) {
+          const newProductionCenter = response.data;
+
+          setSelectedSite((prevState) => {
+            if (!prevState) return prevState;
+
+            if (!newProductionCenter) return prevState;
+
+            return {
+              ...prevState,
+              children: prevState.children
+                ? [...prevState.children, newProductionCenter]
+                : [newProductionCenter],
+            };
+          });
+        }
+
+        setTreeviewState({ ...treeviewState, isNewProductionCenter: false });
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.log(error.message);
+      } else {
+        console.log("An unexpected error occurred");
+      }
+    } finally {
+      fetchData();
+    }
+  };
+
+  const actionSaveStorage = async (formData: FormData) => {
+
+    const storageName = formData.get("storage");
+    const parentIDString = formData.get("parentID");
+    const parentID = parentIDString
+      ? parseInt(parentIDString as string)
+      : undefined;
+
+    const newData = {
+      name: typeof storageName === "string" ? storageName : undefined,
+      parentID: parentIDString ? parseInt(parentIDString as string) : undefined,
+    };
+
+    try {
+      const response = await saveTreeviewName(newData, 6);
+      if (response?.error) {
+        toast.error(response.error);
+      } else {
+        toast.success("Storage created with successfully!");
+        if (treeviewStateData.selectedCountry) {
+          const newStorage = response.data;
+
+          setSelectedSite((prevState) => {
+            if (!prevState) return prevState;
+
+            if (!newStorage) return prevState;
+
+            return {
+              ...prevState,
+              children: prevState.children
+                ? [...prevState.children, newStorage]
+                : [newStorage],
+            };
+          });
+        }
+
+        setTreeviewState({ ...treeviewState, isNewStorage: false });
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.log(error.message);
+      } else {
+        console.log("An unexpected error occurred");
+      }
+    } finally {
       fetchData();
     }
   };
@@ -359,7 +466,7 @@ const TreeView = () => {
               ) : (
                 <>
                   <div className="flex items-center justify-between font-semibold">
-                    <p>Country ({dataTreeview?.length || 0})</p>
+                    <p>Country ({treeviewStateData.dataTreeview?.length || 0})</p>
                     <Button
                       variant="outline"
                       onClick={() =>
@@ -375,20 +482,20 @@ const TreeView = () => {
                 </>
               )}
             </div>
-            {isLoading && (
+            {treeviewState.isLoading && (
               <div className="flex items-center justify-center mt-5 mb-2">
                 <BeatLoader color="#253A79" />
               </div>
             )}
             <ScrollArea className=" h-[88%] pb-5 pr-1">
-              {dataTreeview &&
-                dataTreeview.length > 0 &&
-                dataTreeview.map((data) => (
+              {treeviewStateData.dataTreeview &&
+                treeviewStateData.dataTreeview.length > 0 &&
+                treeviewStateData.dataTreeview.map((data) => (
                   <TreeviewWidget
                     key={data.name}
                     treeview={data}
                     selectedBool={
-                      selectedCountry?.id === data.id ? true : false
+                      treeviewStateData.selectedCountry?.id === data.id ? true : false
                     }
                     onSelectTreeview={() => handleSelectCountry(data.id)}
                   />
@@ -400,7 +507,7 @@ const TreeView = () => {
           {/* Project View */}
           <div
             className={`col-span-1 pl-2 border-r-2 border-gray-300 overflow-hidden ${
-              !selectedCountry && "hidden"
+              !treeviewStateData.selectedCountry && "hidden"
             }`}
           >
             <div className="items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
@@ -409,7 +516,7 @@ const TreeView = () => {
                   <input
                     type="hidden"
                     name="parentID"
-                    value={selectedCountry?.id}
+                    value={treeviewStateData.selectedCountry?.id}
                   ></input>
                   <div className="flex  space-x-2 items-center justify-end w-full">
                     <Input
@@ -443,7 +550,7 @@ const TreeView = () => {
               ) : (
                 <>
                   <div className="flex items-center justify-between font-semibold">
-                    <p>Project ({selectedCountry?.children?.length || 0})</p>
+                    <p>Project ({treeviewStateData.selectedCountry?.children?.length || 0})</p>
                     <Button
                       variant="outline"
                       onClick={() =>
@@ -461,10 +568,10 @@ const TreeView = () => {
             </div>
 
             <ScrollArea className=" h-[88%] pb-5 pr-1">
-              {selectedCountry &&
-                selectedCountry.children &&
-                selectedCountry.children.length > 0 &&
-                selectedCountry.children.map((project) => (
+              {treeviewStateData.selectedCountry &&
+                treeviewStateData.selectedCountry.children &&
+                treeviewStateData.selectedCountry.children.length > 0 &&
+                treeviewStateData.selectedCountry.children.map((project) => (
                   <TreeviewWidget
                     key={project.name}
                     treeview={project}
@@ -492,7 +599,7 @@ const TreeView = () => {
                   ></input>
                   <div className="flex  space-x-2 items-center justify-end w-full">
                     <Input
-                      name="project"
+                      name="site"
                       type="text"
                       placeholder="Site name..."
                       className="w-full h-[30px] focus:ring-0 focus-visible:ring-1 capitalize"
@@ -639,7 +746,7 @@ const TreeView = () => {
             >
               <div className="items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
                 {treeviewState.isNewProductionCenter ? (
-                  <form action={actionSaveSite}>
+                  <form action={actionSaveProductionCenter}>
                     <input
                       type="hidden"
                       name="parentID"
@@ -727,7 +834,7 @@ const TreeView = () => {
             >
               <div className=" items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
                 {treeviewState.isNewStorage ? (
-                  <form action={actionSaveSite}>
+                  <form action={actionSaveStorage}>
                     <input
                       type="hidden"
                       name="parentID"
