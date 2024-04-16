@@ -53,12 +53,9 @@ const TreeView = () => {
   const [savingCountry, setSavingCountry] = useState(false);
   const [savingProject, setSavingProject] = useState(false);
   const [savingSite, setSavingSite] = useState(false);
-  //const [isNewCountry, setIsNewCountry] = useState(false);
-  //const [isNewProject, setIsNewProject] = useState(false);
-  //const [isNewSite, setIsNewSite] = useState(false);
-  // const [isNewSubstore, setIsNewSubstore] = useState(false);
-  // const [isNewStorage, setIsNewStorage] = useState(false);
-  // const [isNewProductionCenter, setIsNewProductionCenter] = useState(false);
+  const [savingSubstore, setSavingSubstore] = useState(false);
+  const [savingProductionCenter, setSavingProductionCenter] = useState(false);
+  const [savingStorage, setSavingStorage] = useState(false);
 
   const [dataTreeview, setDataTreeview] = useState<TTreeview[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<TTreeview | null>(
@@ -214,9 +211,9 @@ const TreeView = () => {
   };
 
   const actionSaveSite = async (formData: FormData) => {
-    setSavingProject(true);
+    setSavingSite(true);
 
-    const projectName = formData.get("project");
+    const projectName = formData.get("substore");
     const parentIDString = formData.get("parentID");
     const parentID = parentIDString
       ? parseInt(parentIDString as string)
@@ -228,24 +225,24 @@ const TreeView = () => {
     };
 
     try {
-      const response = await saveTreeviewName(newData, 2);
+      const response = await saveTreeviewName(newData, 3);
       if (response?.error) {
         toast.error(response.error);
       } else {
-        toast.success("Project created successfully!");
+        toast.success("Site created successfully!");
         if (selectedCountry) {
           setSelectedProject((prevState) => {
             if (!prevState) return prevState;
 
-            const newProject = response.data;
+            const newSite = response.data;
 
-            if (!newProject) return prevState;
+            if (!newSite) return prevState;
 
             return {
               ...prevState,
               children: prevState.children
-                ? [...prevState.children, newProject]
-                : [newProject],
+                ? [...prevState.children, newSite]
+                : [newSite],
             };
           });
         }
@@ -259,6 +256,57 @@ const TreeView = () => {
       }
     } finally {
       setSavingSite(false);
+      fetchData();
+    }
+  };
+
+  const actionSaveSubstore = async (formData: FormData) => {
+    setSavingSubstore(true);
+
+    const substoreName = formData.get("substore");
+    const parentIDString = formData.get("parentID");
+    const parentID = parentIDString
+      ? parseInt(parentIDString as string)
+      : undefined;
+
+    const newData = {
+      name: typeof substoreName === "string" ? substoreName : undefined,
+      parentID: parentIDString ? parseInt(parentIDString as string) : undefined,
+    };
+
+    try {
+      const response = await saveTreeviewName(newData, 4);
+      if (response?.error) {
+        toast.error(response.error);
+      } else {
+        toast.success("Sub-store created successfully!");
+        if (selectedCountry) {
+          const newSubstore = response.data;
+
+          setSelectedSite((prevState) => {
+            if (!prevState) return prevState;
+
+            if (!newSubstore) return prevState;
+
+            return {
+              ...prevState,
+              children: prevState.children
+                ? [...prevState.children, newSubstore]
+                : [newSubstore],
+            };
+          });
+        }
+
+        setTreeviewState({ ...treeviewState, isNewSubstore: false });
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.log(error.message);
+      } else {
+        console.log("An unexpected error occurred");
+      }
+    } finally {
+      setSavingSubstore(false);
       fetchData();
     }
   };
@@ -512,7 +560,7 @@ const TreeView = () => {
           >
             <div className="items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
               {treeviewState.isNewSubstore ? (
-                <form action={actionSaveSite}>
+                <form action={actionSaveSubstore}>
                   <input
                     type="hidden"
                     name="parentID"
