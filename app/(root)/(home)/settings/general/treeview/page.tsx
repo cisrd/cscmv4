@@ -54,11 +54,11 @@ const TreeView = () => {
   const [savingProject, setSavingProject] = useState(false);
   const [savingSite, setSavingSite] = useState(false);
   //const [isNewCountry, setIsNewCountry] = useState(false);
-  const [isNewProject, setIsNewProject] = useState(false);
-  const [isNewSite, setIsNewSite] = useState(false);
-  const [isNewSubstore, setIsNewSubstore] = useState(false);
-  const [isNewStorage, setIsNewStorage] = useState(false);
-  const [isNewProductionCenter, setIsNewProductionCenter] = useState(false);
+  //const [isNewProject, setIsNewProject] = useState(false);
+  //const [isNewSite, setIsNewSite] = useState(false);
+  // const [isNewSubstore, setIsNewSubstore] = useState(false);
+  // const [isNewStorage, setIsNewStorage] = useState(false);
+  // const [isNewProductionCenter, setIsNewProductionCenter] = useState(false);
 
   const [dataTreeview, setDataTreeview] = useState<TTreeview[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<TTreeview | null>(
@@ -199,7 +199,7 @@ const TreeView = () => {
             };
           });
         }
-        setIsNewProject(false);
+        setTreeviewState({ ...treeviewState, isNewProject: false });
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -249,7 +249,7 @@ const TreeView = () => {
             };
           });
         }
-        setIsNewSite(false);
+        setTreeviewState({ ...treeviewState, isNewSite: false });
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -356,7 +356,7 @@ const TreeView = () => {
             }`}
           >
             <div className="items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
-              {isNewProject ? (
+              {treeviewState.isNewProject ? (
                 <form action={actionSaveProject}>
                   <input
                     type="hidden"
@@ -381,7 +381,12 @@ const TreeView = () => {
                       <SquareX
                         height={25}
                         width={25}
-                        onClick={() => setIsNewProject(false)}
+                        onClick={() =>
+                          setTreeviewState({
+                            ...treeviewState,
+                            isNewProject: false,
+                          })
+                        }
                         className="cursor-pointer hover:bg-sidebar-background"
                       />
                     </div>
@@ -393,7 +398,12 @@ const TreeView = () => {
                     <p>Project ({selectedCountry?.children?.length || 0})</p>
                     <Button
                       variant="outline"
-                      onClick={() => setIsNewProject(true)}
+                      onClick={() =>
+                        setTreeviewState({
+                          ...treeviewState,
+                          isNewProject: true,
+                        })
+                      }
                     >
                       New
                     </Button>
@@ -425,7 +435,7 @@ const TreeView = () => {
             }`}
           >
             <div className="items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
-              {isNewSite ? (
+              {treeviewState.isNewSite ? (
                 <form action={actionSaveSite}>
                   <input
                     type="hidden"
@@ -450,7 +460,12 @@ const TreeView = () => {
                       <SquareX
                         height={25}
                         width={25}
-                        onClick={() => setIsNewProject(false)}
+                        onClick={() =>
+                          setTreeviewState({
+                            ...treeviewState,
+                            isNewSite: false,
+                          })
+                        }
                         className="cursor-pointer hover:bg-sidebar-background"
                       />
                     </div>
@@ -462,7 +477,9 @@ const TreeView = () => {
                     <p>Site ({selectedProject?.children?.length || 0})</p>
                     <Button
                       variant="outline"
-                      onClick={() => setIsNewSite(true)}
+                      onClick={() =>
+                        setTreeviewState({ ...treeviewState, isNewSite: true })
+                      }
                     >
                       New
                     </Button>
@@ -493,9 +510,61 @@ const TreeView = () => {
               !selectedSite && "hidden"
             }`}
           >
-            <div className="flex items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
-              <p>Substore ({selectedSite?.children?.length || 0})</p>
-              <Button variant={"outline"}>New</Button>
+            <div className="items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
+              {treeviewState.isNewSubstore ? (
+                <form action={actionSaveSite}>
+                  <input
+                    type="hidden"
+                    name="parentID"
+                    value={selectedSite?.id}
+                  ></input>
+                  <div className="flex  space-x-2 items-center justify-end w-full">
+                    <Input
+                      name="substore"
+                      type="text"
+                      placeholder="Sub-store name..."
+                      className="w-full h-[30px] focus:ring-0 focus-visible:ring-1 capitalize"
+                    />
+                    <div className="ml-auto flex items-center">
+                      <button type="submit" className="icon-button">
+                        <Check
+                          height={25}
+                          width={25}
+                          className="cursor-pointer justify-end hover:bg-sidebar-background mr-1"
+                        />
+                      </button>
+                      <SquareX
+                        height={25}
+                        width={25}
+                        onClick={() =>
+                          setTreeviewState({
+                            ...treeviewState,
+                            isNewSubstore: false,
+                          })
+                        }
+                        className="cursor-pointer hover:bg-sidebar-background"
+                      />
+                    </div>
+                  </div>
+                </form>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between font-semibold">
+                    <p>Sub-Store ({selectedSite?.children?.length || 0})</p>
+                    <Button
+                      variant="outline"
+                      onClick={() =>
+                        setTreeviewState({
+                          ...treeviewState,
+                          isNewSubstore: true,
+                        })
+                      }
+                    >
+                      New
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
             <ScrollArea className=" h-[88%] pb-5 pr-1">
               {selectedSite &&
@@ -513,19 +582,74 @@ const TreeView = () => {
           </div>
           {/* End Substore View */}
 
-          {/* Productioo Center View */}
+          {/* Production Center View */}
           <div className="flex flex-col h-screen">
             <div
               className={`flex-1 pl-2 border-r-2 border-gray-300 overflow-hidden ${
                 !selectedSubstore && "hidden"
               }`}
             >
-              <div className="flex items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
-                <p>
-                  Produdction Center (
-                  {selectedProductionCenter?.children?.length || 0})
-                </p>
-                <Button variant={"outline"}>New</Button>
+              <div className="items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
+                {treeviewState.isNewProductionCenter ? (
+                  <form action={actionSaveSite}>
+                    <input
+                      type="hidden"
+                      name="parentID"
+                      value={selectedSubstore?.id}
+                    ></input>
+                    <div className="flex  space-x-2 items-center justify-end w-full">
+                      <Input
+                        name="production-center"
+                        type="text"
+                        placeholder="Production Center name..."
+                        className="w-full h-[30px] focus:ring-0 focus-visible:ring-1 capitalize"
+                      />
+                      <div className="ml-auto flex items-center">
+                        <button type="submit" className="icon-button">
+                          <Check
+                            height={25}
+                            width={25}
+                            className="cursor-pointer justify-end hover:bg-sidebar-background mr-1"
+                          />
+                        </button>
+                        <SquareX
+                          height={25}
+                          width={25}
+                          onClick={() =>
+                            setTreeviewState({
+                              ...treeviewState,
+                              isNewProductionCenter: false,
+                            })
+                          }
+                          className="cursor-pointer hover:bg-sidebar-background"
+                        />
+                      </div>
+                    </div>
+                  </form>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between font-semibold">
+                      <p>
+                        Production Center (
+                        {selectedSubstore?.children?.filter(
+                          (productionCenter) => productionCenter.level === 5
+                        ).length || 0}
+                        )
+                      </p>
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          setTreeviewState({
+                            ...treeviewState,
+                            isNewProductionCenter: true,
+                          })
+                        }
+                      >
+                        New
+                      </Button>
+                    </div>
+                  </>
+                )}
               </div>
               {selectedSubstore &&
                 selectedSubstore.children &&
@@ -545,17 +669,75 @@ const TreeView = () => {
                     />
                   ))}
             </div>
+            {/* End Production Center View */}
 
+            {/* Storage View */}
             <div
               className={`flex-1 pl-2 border-r-2 border-gray-300 overflow-hidden ${
                 !selectedSubstore && "hidden"
               }`}
             >
-              <div className="flex items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
-                <p>
-                  Storage ({selectedProductionCenter?.children?.length || 0})
-                </p>
-                <Button variant={"outline"}>New</Button>
+              <div className=" items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
+                {treeviewState.isNewStorage ? (
+                  <form action={actionSaveSite}>
+                    <input
+                      type="hidden"
+                      name="parentID"
+                      value={selectedSubstore?.id}
+                    ></input>
+                    <div className="flex  space-x-2 items-center justify-end w-full">
+                      <Input
+                        name="storage"
+                        type="text"
+                        placeholder="Storage name..."
+                        className="w-full h-[30px] focus:ring-0 focus-visible:ring-1 capitalize"
+                      />
+                      <div className="ml-auto flex items-center">
+                        <button type="submit" className="icon-button">
+                          <Check
+                            height={25}
+                            width={25}
+                            className="cursor-pointer justify-end hover:bg-sidebar-background mr-1"
+                          />
+                        </button>
+                        <SquareX
+                          height={25}
+                          width={25}
+                          onClick={() =>
+                            setTreeviewState({
+                              ...treeviewState,
+                              isNewStorage: false,
+                            })
+                          }
+                          className="cursor-pointer hover:bg-sidebar-background"
+                        />
+                      </div>
+                    </div>
+                  </form>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between font-semibold">
+                      <p>
+                        Storage (
+                        {selectedSubstore?.children?.filter(
+                          (productionCenter) => productionCenter.level === 6
+                        ).length || 0}
+                        )
+                      </p>
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          setTreeviewState({
+                            ...treeviewState,
+                            isNewStorage: true,
+                          })
+                        }
+                      >
+                        New
+                      </Button>
+                    </div>
+                  </>
+                )}
               </div>
               {selectedSubstore &&
                 selectedSubstore.children &&
@@ -574,7 +756,7 @@ const TreeView = () => {
                   ))}
             </div>
           </div>
-          {/* End Productioo Center View */}
+          {/* End Storage View */}
         </div>
       </div>
     </div>

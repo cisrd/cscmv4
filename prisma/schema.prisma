@@ -61,4 +61,6 @@ model TTreeview {
   updatedBy    String?     @db.VarChar(50)
   children     TTreeview[] @relation("TreeviewToTreeview")
   parent       TTreeview?  @relation("TreeviewToTreeview", fields: [parentId], references: [id])
+
+  @@unique([name, parentId], name: "unique_name_parentId")
 }
