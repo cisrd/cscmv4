@@ -129,15 +129,15 @@ const TreeView = () => {
   };
 
   const handleSelectSubstore = (selectedId: number) => {
+    
     const selected = selectedSite?.children?.find(
       (substore) => substore.id === selectedId
     ) as TTreeview;
-    console.log(selected);
     setSelectedSubstore(selected);
   };
 
   const handleSelectProductionCenter = (selectedId: number) => {
-    //console.log(selectedId);
+    fetchData(); 
     const selected = selectedSubstore?.children?.find(
       (productionCenter) => productionCenter.id === selectedId
     ) as TTreeview;
@@ -185,7 +185,7 @@ const TreeView = () => {
       if (response?.error) {
         toast.error(response.error);
       } else {
-        toast.success("Project created successfully!");
+        toast.success("Project has been created with successfully!");
         if (treeviewStateData.selectedCountry) {
           
           setTreeviewStateData(prevState => {
@@ -207,10 +207,8 @@ const TreeView = () => {
           });
         }
         setTreeviewState({ ...treeviewState, isNewProject: false });
-        console.log(treeviewStateData.selectedCountry)
-        console.log(treeviewStateData.dataTreeview)
         fetchData();
-        //handleSelectCountry(treeviewStateData.selectedCountry?.parentId)
+        // handleSelectCountry(treeviewStateData.selectedCountry?.parentId)
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -342,7 +340,7 @@ const TreeView = () => {
         if (treeviewStateData.selectedCountry) {
           const newProductionCenter = response.data;
 
-          setSelectedSite((prevState) => {
+          setSelectedSubstore((prevState) => {
             if (!prevState) return prevState;
 
             if (!newProductionCenter) return prevState;
@@ -388,23 +386,12 @@ const TreeView = () => {
         toast.error(response.error);
       } else {
         toast.success("Storage created with successfully!");
-        if (treeviewStateData.selectedCountry) {
-          const newStorage = response.data;
-
-          setSelectedSite((prevState) => {
-            if (!prevState) return prevState;
-
-            if (!newStorage) return prevState;
-
-            return {
-              ...prevState,
-              children: prevState.children
-                ? [...prevState.children, newStorage]
-                : [newStorage],
-            };
-          });
-        }
-
+        setSelectedSubstore(prevState => {
+          if (!prevState || !response.data) return prevState; // Maintain the current state if null or response is faulty
+          const newStorage = { ...response.data, children: [] };
+          const updatedChildren = prevState.children ? [...prevState.children, newStorage] : [newStorage];
+          return { ...prevState, children: updatedChildren }; // Explicit structured update
+        });
         setTreeviewState({ ...treeviewState, isNewStorage: false });
       }
     } catch (error: unknown) {
