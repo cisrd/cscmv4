@@ -36,17 +36,31 @@ const variants = {
 };
 
 const TreeView = () => {
-  const [dataTreeview, setDataTreeview] = useState<TTreeview[]>([]);
+  const [treeviewState, setTreeviewState] = useState({
+    isLoading: false,
+    savingCountry: false,
+    savingProject: false,
+    savingSite: false,
+    isNewCountry: false,
+    isNewProject: false,
+    isNewSite: false,
+    isNewSubstore: false,
+    isNewStorage: false,
+    isNewProductionCenter: false,
+  });
+
   const [isLoading, setIsLoading] = useState(false);
   const [savingCountry, setSavingCountry] = useState(false);
   const [savingProject, setSavingProject] = useState(false);
   const [savingSite, setSavingSite] = useState(false);
-  const [isNewCountry, setIsNewCountry] = useState(false);
+  //const [isNewCountry, setIsNewCountry] = useState(false);
   const [isNewProject, setIsNewProject] = useState(false);
   const [isNewSite, setIsNewSite] = useState(false);
   const [isNewSubstore, setIsNewSubstore] = useState(false);
   const [isNewStorage, setIsNewStorage] = useState(false);
   const [isNewProductionCenter, setIsNewProductionCenter] = useState(false);
+
+  const [dataTreeview, setDataTreeview] = useState<TTreeview[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<TTreeview | null>(
     null
   );
@@ -64,7 +78,6 @@ const TreeView = () => {
     useState<TTreeview | null>(null);
 
   const fetchData = async (): Promise<void> => {
-
     try {
       const response = await axios.get<TTreeview[]>(
         "/api/settings/general/treeview"
@@ -77,7 +90,6 @@ const TreeView = () => {
         console.error("Unexpected Error:", error);
       }
     }
-
   };
 
   const handleSelectCountry = (selectedId: number) => {
@@ -145,7 +157,8 @@ const TreeView = () => {
     } else {
       toast.success("Country have been created with successfully!");
       setSavingCountry(false);
-      setIsNewCountry(false);
+      setTreeviewState({ ...treeviewState, isNewCountry: false });
+      //setIsNewCountry(false);
       fetchData();
     }
   };
@@ -264,7 +277,7 @@ const TreeView = () => {
             className="col-span-1 border-r-2 border-gray-300 overflow-hidden"
           >
             <div className="items-center justify-between p-1 border-b border-gray-200 mr-3 font-semibold">
-              {isNewCountry ? (
+              {treeviewState.isNewCountry ? (
                 <form action={actionSaveCountry}>
                   <div className="flex  space-x-2 items-center justify-end w-full">
                     <Input
@@ -284,7 +297,12 @@ const TreeView = () => {
                       <SquareX
                         height={25}
                         width={25}
-                        onClick={() => setIsNewCountry(false)}
+                        onClick={() =>
+                          setTreeviewState({
+                            ...treeviewState,
+                            isNewCountry: false,
+                          })
+                        }
                         className="cursor-pointer hover:bg-sidebar-background"
                       />
                     </div>
@@ -296,7 +314,12 @@ const TreeView = () => {
                     <p>Country ({dataTreeview?.length || 0})</p>
                     <Button
                       variant="outline"
-                      onClick={() => setIsNewCountry(true)}
+                      onClick={() =>
+                        setTreeviewState({
+                          ...treeviewState,
+                          isNewCountry: true,
+                        })
+                      }
                     >
                       New
                     </Button>
