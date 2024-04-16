@@ -7,7 +7,7 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import BeatLoader from "react-spinners/BeatLoader";
 import { Input } from "@/components/ui/input";
-import { Check, CirclePlus, SquareX } from "lucide-react";
+import { Check, SquareX } from "lucide-react";
 import { saveTreeviewName } from "./action";
 import toast from "react-hot-toast";
 import TreeviewWidget from "./treeview-widget";
@@ -431,14 +431,15 @@ const TreeView = () => {
                   <div className="flex items-center justify-between font-semibold">
                     <p>Country ({treeviewStateData.dataTreeview?.length || 0})</p>
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       onClick={() =>
                         setTreeviewState({
                           ...treeviewState,
                           isNewCountry: true,
                         })
                       }
-                    ><CirclePlus height={25} width={25}/>
+                    >
+                      New
                     </Button>
                   </div>
                 </>

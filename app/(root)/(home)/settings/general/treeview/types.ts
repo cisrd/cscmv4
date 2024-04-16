@@ -14,12 +14,22 @@ export interface TTreeview {
     children?: TTreeview[];
     parent?: TTreeview;
   }
-
-export interface CountryViewProps {
+ export  interface IState {
     dataTreeview: TTreeview[];
     selectedCountry: TTreeview | null;
-    onSelectCountry: (id: number) => void;
-    isNewCountry: boolean;
-    setIsNewCountry: (isNew: boolean) => void;
-    actionSaveCountry: (event: React.FormEvent<HTMLFormElement>) => void;
+    // selectedProject: TTreeview | null;
+    // selectedSite: TTreeview | null;
+    // selectedSubstore: TTreeview | null;
+    // selectedStorage: TTreeview | null;
+    // selectedProductionCenter: TTreeview | null;
   }
+  
+ export const initialState: IState = {
+    dataTreeview: [],
+    selectedCountry: null,
+    // selectedProject: null,
+    // selectedSite: null,
+    // selectedSubstore: null,
+    // selectedStorage: null,
+    // selectedProductionCenter: null,
+  };
