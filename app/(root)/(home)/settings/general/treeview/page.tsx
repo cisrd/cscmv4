@@ -63,16 +63,21 @@ const TreeView = () => {
   const [selectedProductionCenter, setSelectedProductionCenter] =
     useState<TTreeview | null>(null);
 
-  const fetchData = async () => {
-    const url = "/api/settings/general/treeview";
+  const fetchData = async (): Promise<void> => {
+
     try {
-      const response = await axios.get(url);
-      const jsonData = await response.data;
-      setDataTreeview(jsonData);
-    } catch (error) {
-      setIsLoading(false);
-      return;
+      const response = await axios.get<TTreeview[]>(
+        "/api/settings/general/treeview"
+      );
+      setDataTreeview(response.data);
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        console.error("API Error:", error.message);
+      } else {
+        console.error("Unexpected Error:", error);
+      }
     }
+
   };
 
   const handleSelectCountry = (selectedId: number) => {
@@ -181,7 +186,7 @@ const TreeView = () => {
             };
           });
         }
-          setIsNewProject(false);
+        setIsNewProject(false);
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -231,7 +236,7 @@ const TreeView = () => {
             };
           });
         }
-          setIsNewSite(false);
+        setIsNewSite(false);
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -244,7 +249,6 @@ const TreeView = () => {
       fetchData();
     }
   };
-
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
@@ -397,7 +401,7 @@ const TreeView = () => {
               !selectedProject && "hidden"
             }`}
           >
-<div className="items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
+            <div className="items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
               {isNewSite ? (
                 <form action={actionSaveSite}>
                   <input
@@ -432,7 +436,7 @@ const TreeView = () => {
               ) : (
                 <>
                   <div className="flex items-center justify-between font-semibold">
-                    <p>Project ({selectedProject?.children?.length || 0})</p>
+                    <p>Site ({selectedProject?.children?.length || 0})</p>
                     <Button
                       variant="outline"
                       onClick={() => setIsNewSite(true)}
