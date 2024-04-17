@@ -10,9 +10,9 @@ import SubstoreView from "./view-substore";
 import ProductionCenterView from "./view-production-center";
 import StorageView from "./view-storage";
 import { treeviewStore } from "@/store/settings";
-import FormTreeview from "./form";
-import SheetUi from "@/app/(root)/_components/ui/sheet-ui";
-import { ButtonSheetTrigger } from "./ui-component";
+
+import { SearchOutlined } from "@ant-design/icons";
+import { Button, Drawer, Tooltip } from "antd";
 
 interface TTreeview {
   id: number;
@@ -39,8 +39,6 @@ const variants = {
 
 const TreeView = () => {
 
-  const treeviewZustand = treeviewStore((state: any) => state.treeview);
-  const updateTreeview = treeviewStore((state: any) => state.updateTreeview);
 
   const [treeviewState, setTreeviewState] = useState({
     isLoading: false,
@@ -136,11 +134,23 @@ const TreeView = () => {
     setSelectedProductionCenter(selectedSubstore);
   };
 
+  const [open, setOpen] = useState(false);
+
+  const showDrawer = () => {
+    setOpen(true);
+  };
+
+  const onClose = () => {
+    setOpen(false);
+  };
+
+  const treeviewZustand = treeviewStore((state: any) => state.treeviewZustand);
+  const updateTreeview = treeviewStore((state: any) => state.updateTreeview);
+
   return (
     <div className="flex flex-col h-screen overflow-hidden">
       <div className="flex flex-1 bg-white p-3 rounded-s-sm">
         <div className="h-screen w-full grid grid-cols-5">
-
           {/* Country View */}
           <CountryView
             isNewCountry={treeviewState.isNewCountry}
@@ -152,6 +162,20 @@ const TreeView = () => {
             treeviewState={treeviewState}
             fetchData={fetchData}
           />
+          <Drawer
+            title="Basic Drawer"
+            onClose={() => {
+              updateTreeview({
+                isSheetOpen: false,
+              });
+            }}
+            open={treeviewZustand.isSheetOpen}
+
+          >
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+          </Drawer>
           {/* End Country View */}
 
           {/* Project View */}

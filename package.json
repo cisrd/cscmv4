@@ -13,6 +13,7 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@ant-design/nextjs-registry": "^1.0.0",
     "@clerk/nextjs": "^4.29.12",
     "@emotion/react": "^11.11.4",
     "@faker-js/faker": "^6.6.6",
@@ -49,6 +50,7 @@
     "@radix-ui/react-toast": "^1.1.5",
     "@tabler/icons-react": "^3.1.0",
     "@types/lodash": "^4.17.0",
+    "antd": "^5.16.2",
     "axios": "^1.6.8",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
