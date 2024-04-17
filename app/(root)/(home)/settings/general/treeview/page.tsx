@@ -17,6 +17,8 @@ import {
 } from "./ui-component";
 import CountryView from "./country-view";
 import ProjectView from "./project-view";
+import SiteView from "./site-view";
+import SubstoreView from "./substore-view";
 
 interface TTreeview {
   id: number;
@@ -138,153 +140,6 @@ const TreeView = () => {
     setSelectedProductionCenter(selectedSubstore);
   };
 
-  const actionSaveProject = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const projectName = formData.get("project");
-    const parentIDString = formData.get("parentID");
-    const parentID = parentIDString
-      ? parseInt(parentIDString as string)
-      : undefined;
-
-    const newData = {
-      name: typeof projectName === "string" ? projectName : undefined,
-      parentID: parentIDString ? parseInt(parentIDString as string) : undefined,
-    };
-
-    try {
-      const response = await saveTreeviewName(newData, 2);
-      if (response?.error) {
-        toast.error(response.error);
-      } else {
-        toast.success("Project has been created with successfully!");
-
-        setTreeviewStateData((prevState) => {
-          if (!prevState || !response.data) return prevState;
-          const updatedData = prevState.dataTreeview.map((country) => {
-            if (country.id === parentID) {
-              const newProjects = [...(country.children || []), response.data];
-              console.log(newProjects);
-              return { ...country, children: newProjects };
-            }
-            return country;
-          });
-          return { ...prevState, dataTreeview: updatedData };
-        });
-        setTreeviewState({ ...treeviewState, isNewProject: false });
-        // if (!prevState || !response.data) return prevState;
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message); // Safe to access `message`
-      } else {
-        console.log("An unexpected error occurred");
-      }
-    } finally {
-    }
-  };
-
-  const actionSaveSite = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const projectName = formData.get("site");
-    const parentIDString = formData.get("parentID");
-    const parentID = parentIDString
-      ? parseInt(parentIDString as string)
-      : undefined;
-
-    const newData = {
-      name: typeof projectName === "string" ? projectName : undefined,
-      parentID: parentIDString ? parseInt(parentIDString as string) : undefined,
-    };
-
-    try {
-      const response = await saveTreeviewName(newData, 3);
-      if (response?.error) {
-        toast.error(response.error);
-      } else {
-        toast.success("Site created successfully!");
-        if (treeviewStateData.selectedCountry) {
-          setSelectedProject((prevState) => {
-            if (!prevState) return prevState;
-
-            const newSite = response.data;
-
-            if (!newSite) return prevState;
-
-            return {
-              ...prevState,
-              children: prevState.children
-                ? [...prevState.children, newSite]
-                : [newSite],
-            };
-          });
-        }
-        setTreeviewState({ ...treeviewState, isNewSite: false });
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message); // Safe to access `message`
-      } else {
-        console.log("An unexpected error occurred");
-      }
-    } finally {
-      fetchData();
-    }
-  };
-
-  const actionSaveSubstore = async (
-    event: React.FormEvent<HTMLFormElement>
-  ) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const substoreName = formData.get("substore");
-    const parentIDString = formData.get("parentID");
-    const parentID = parentIDString
-      ? parseInt(parentIDString as string)
-      : undefined;
-
-    const newData = {
-      name: typeof substoreName === "string" ? substoreName : undefined,
-      parentID: parentIDString ? parseInt(parentIDString as string) : undefined,
-    };
-
-    try {
-      const response = await saveTreeviewName(newData, 4);
-      if (response?.error) {
-        toast.error(response.error);
-      } else {
-        toast.success("Sub-store created successfully!");
-        if (treeviewStateData.selectedCountry) {
-          const newSubstore = response.data;
-
-          setSelectedSite((prevState) => {
-            if (!prevState) return prevState;
-
-            if (!newSubstore) return prevState;
-
-            return {
-              ...prevState,
-              children: prevState.children
-                ? [...prevState.children, newSubstore]
-                : [newSubstore],
-            };
-          });
-        }
-
-        setTreeviewState({ ...treeviewState, isNewSubstore: false });
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
-    } finally {
-      fetchData();
-    }
-  };
-
   const actionSaveProductionCenter = async (
     event: React.FormEvent<HTMLFormElement>
   ) => {
@@ -397,6 +252,8 @@ const TreeView = () => {
             fetchData={fetchData}
           />
           {/* End Country View */}
+
+          {/* Project View */}
           <ProjectView
             isNewProject={treeviewState.isNewProject}
             selectedProject={selectedProject}
@@ -406,114 +263,34 @@ const TreeView = () => {
             setTreeviewState={setTreeviewState}
             handleSelectProject={handleSelectProject}
           />
-
-          {/* Project View */}
-
           {/* End Project View */}
 
           {/* Site View */}
-          <div
-            className={`col-span-1 pl-2 border-r-2 border-gray-300 overflow-hidden ${
-              !selectedProject && "hidden"
-            }`}
-          >
-            <div className="items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
-              {treeviewState.isNewSite ? (
-                <FormInputNewTreeview
-                  inputName="site"
-                  placeholder="Site name..."
-                  onSubmit={actionSaveSite}
-                  onCancel={() =>
-                    setTreeviewState({ ...treeviewState, isNewSite: false })
-                  }
-                  parentID={selectedProject?.id}
-                />
-              ) : (
-                <>
-                  <div className="flex items-center justify-between font-semibold">
-                    <HeaderTreeview
-                      title="Site"
-                      count={selectedProject?.children?.length || 0}
-                    />
-                    <ButtonNew
-                      onAddClick={() =>
-                        setTreeviewState({
-                          ...treeviewState,
-                          isNewSite: true,
-                        })
-                      }
-                    />
-                  </div>
-                </>
-              )}
-            </div>
-
-            <ScrollArea className=" h-[88%] pb-5 pr-1">
-              {selectedProject &&
-                selectedProject.children &&
-                selectedProject.children.length > 0 &&
-                selectedProject.children.map((site) => (
-                  <TreeviewWidget
-                    key={site.name}
-                    treeview={site}
-                    selectedBool={selectedSite?.id === site.id}
-                    onSelectTreeview={() => handleSelectSite(site.id)}
-                  />
-                ))}
-            </ScrollArea>
-          </div>
+          <SiteView
+            isNewSite={treeviewState.isNewSite}
+            selectedSite={selectedSite}
+            treeviewStateData={treeviewStateData}
+            setSelectedProject={setSelectedProject}
+            treeviewState={treeviewState}
+            selectedProject={selectedProject}
+            setTreeviewState={setTreeviewState}
+            handleSelectSite={handleSelectSite}
+            fetchData={fetchData}
+          />
           {/* End Site View */}
 
           {/* Substore View */}
-          <div
-            className={`col-span-1 pl-2 border-r-2 border-gray-300 overflow-hidden ${
-              !selectedSite && "hidden"
-            }`}
-          >
-            <div className="items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
-              {treeviewState.isNewSubstore ? (
-                <FormInputNewTreeview
-                  inputName="substore"
-                  placeholder="Sub-store name..."
-                  onSubmit={actionSaveSubstore}
-                  onCancel={() =>
-                    setTreeviewState({ ...treeviewState, isNewSubstore: false })
-                  }
-                  parentID={selectedSite?.id}
-                />
-              ) : (
-                <>
-                  <div className="flex items-center justify-between font-semibold">
-                    <HeaderTreeview
-                      title="Sub-Store"
-                      count={selectedSite?.children?.length || 0}
-                    />
-                    <ButtonNew
-                      onAddClick={() =>
-                        setTreeviewState({
-                          ...treeviewState,
-                          isNewSubstore: true,
-                        })
-                      }
-                    />
-                  </div>
-                </>
-              )}
-            </div>
-            <ScrollArea className=" h-[88%] pb-5 pr-1">
-              {selectedSite &&
-                selectedSite.children &&
-                selectedSite.children.length > 0 &&
-                selectedSite.children.map((substore) => (
-                  <TreeviewWidget
-                    key={substore.name}
-                    treeview={substore}
-                    selectedBool={selectedSubstore?.id === substore.id}
-                    onSelectTreeview={() => handleSelectSubstore(substore.id)}
-                  />
-                ))}
-            </ScrollArea>
-          </div>
+          <SubstoreView
+            isNewSubstore={treeviewState.isNewSubstore}
+            selectedSubstore={selectedSubstore}
+            treeviewStateData={treeviewStateData}
+            setSelectedSite={setSelectedSite}
+            treeviewState={treeviewState}
+            selectedSite={selectedSite}
+            setTreeviewState={setTreeviewState}
+            handleSelectSubstore={handleSelectSubstore}
+            fetchData={fetchData}
+          />
           {/* End Substore View */}
 
           {/* Production Center View */}
