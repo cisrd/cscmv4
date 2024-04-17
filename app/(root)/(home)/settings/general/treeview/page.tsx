@@ -403,65 +403,16 @@ const TreeView = () => {
       <div className="flex flex-1 bg-white p-3 rounded-s-sm">
         <div className="h-screen w-full grid grid-cols-5">
           {/* Country View */}
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            variants={variants}
-            transition={{ duration: 1 }}
-            className="col-span-1 border-r-2 border-gray-300 overflow-hidden"
-          >
-            <div className="items-center justify-between p-1 border-b border-gray-200 mr-2 font-semibold">
-              {treeviewState.isNewCountry ? (
-                <FormInputNewCountry
-                  inputName="country"
-                  placeholder="Country name..."
-                  onSubmit={actionSaveCountry} // Define this function in your component logic
-                  onCancel={() =>
-                    setTreeviewState({ ...treeviewState, isNewCountry: false })
-                  }
-                />
-              ) : (
-                <>
-                  <div className="flex items-center justify-between font-semibold">
-                    <HeaderTreeview
-                      title="Country"
-                      count={treeviewStateData.dataTreeview?.length || 0}
-                    />
-                    <ButtonNew
-                      onAddClick={() =>
-                        setTreeviewState({
-                          ...treeviewState,
-                          isNewCountry: true,
-                        })
-                      }
-                    />
-                  </div>
-                </>
-              )}
-            </div>
-            {treeviewState.isLoading && (
-              <div className="flex items-center justify-center mt-5 mb-2">
-                <BeatLoader color="#253A79" />
-              </div>
-            )}
-            <ScrollArea className=" h-[88%] pb-5 pr-1">
-              {treeviewStateData.dataTreeview &&
-                treeviewStateData.dataTreeview.length > 0 &&
-                treeviewStateData.dataTreeview.map((data) => (
-                  <TreeviewWidget
-                    key={data.name}
-                    treeview={data}
-                    selectedBool={
-                      treeviewStateData.selectedCountry?.id === data.id
-                        ? true
-                        : false
-                    }
-                    onSelectTreeview={() => handleSelectCountry(data.id)}
-                  />
-                ))}
-            </ScrollArea>
-          </motion.div>
+          <CountryView
+            isNewCountry={treeviewState.isNewCountry}
+            isLoading={treeviewState.isLoading}
+            treeviewStateData={treeviewStateData}
+            setTreeviewState={setTreeviewState}
+            handleSelectCountry={handleSelectCountry}
+            variants={variants} // Make sure to define these animations
+            treeviewState={treeviewState}
+            fetchData={fetchData}
+          />
           {/* End Country View */}
 
           {/* Project View */}

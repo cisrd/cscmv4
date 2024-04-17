@@ -20,6 +20,10 @@ interface CountryViewProps {
   isLoading: boolean;
   handleSelectCountry: (id: number) => void;
   variants: any;
+  treeviewState: any;
+  setTreeviewState: (state: any) => void;
+  treeviewStateData: IState;
+  fetchData: () => void;
 }
 
 const CountryView: React.FC<CountryViewProps> = ({
@@ -27,33 +31,11 @@ const CountryView: React.FC<CountryViewProps> = ({
   isLoading,
   handleSelectCountry,
   variants,
+  treeviewState,
+  setTreeviewState,
+  treeviewStateData,
+  fetchData,
 }) => {
-  const [treeviewState, setTreeviewState] = useState({
-    isLoading: false,
-    idCountry: 0,
-    isNewCountry: false,
-  });
-  const [treeviewStateData, setTreeviewStateData] =
-    useState<IState>(initialState);
-
-  const fetchData = async (): Promise<void> => {
-    try {
-      const response = await axios.get<TTreeview[]>(
-        "/api/settings/general/treeview"
-      );
-      setTreeviewStateData({
-        ...treeviewStateData,
-        dataTreeview: response.data,
-      });
-    } catch (error: any) {
-      if (axios.isAxiosError(error)) {
-        console.error("API Error:", error.message);
-      } else {
-        console.error("Unexpected Error:", error);
-      }
-    }
-  };
-
   const actionSaveCountry = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -66,7 +48,7 @@ const CountryView: React.FC<CountryViewProps> = ({
     if (response?.error) {
       toast.error(response.error);
     } else {
-      toast.success("Country have been created with successfully!");
+      toast.success("Country has been created successfully!");
       setTreeviewState({ ...treeviewState, isNewCountry: false });
       fetchData();
     }
@@ -100,10 +82,7 @@ const CountryView: React.FC<CountryViewProps> = ({
               />
               <ButtonNew
                 onAddClick={() =>
-                  setTreeviewState({
-                    ...treeviewState,
-                    isNewCountry: true,
-                  })
+                  setTreeviewState({ ...treeviewState, isNewCountry: true })
                 }
               />
             </div>
