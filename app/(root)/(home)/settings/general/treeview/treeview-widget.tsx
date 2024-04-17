@@ -3,6 +3,10 @@
 import { Pencil } from "lucide-react";
 import { TTreeview } from "@prisma/client";
 import { Button } from "@/components/ui/button";
+import SheetUi from "@/app/(root)/_components/ui/sheet-ui";
+import FormTreeview from "./form";
+import { ButtonSheetTrigger } from "./ui-component";
+import { treeviewStore } from "@/store/settings";
 
 interface TreeviewWidgetProps {
   key: string;
@@ -16,22 +20,40 @@ const TreeviewWidget: React.FC<TreeviewWidgetProps> = ({
   selectedBool,
   onSelectTreeview,
 }) => {
+
+  const treeviewZustand = treeviewStore((state: any) => state.treeviewZustand);
+  const updateTreeview = treeviewStore((state: any) => state.updateTreeview);
+
   return (
     <div
       className={`group flex items-center justify-between border rounded-[4px] p-2 
-    cursor-pointer min-h-[40px] text-sidebar-active font-semibold mt-3 mr-3 relative hover:bg-sidebar-background
-    ${selectedBool ? "bg-sidebar-background" : "bg-slate-100 "}
+    cursor-pointer  text-sidebar-active font-semibold mt-3 mr-3 relative hover:bg-sidebar-background
+    ${
+      selectedBool
+        ? "bg-sidebar-background min-h-[55px]"
+        : "bg-slate-100 min-h-[40px]"
+    }
     `}
       onClick={onSelectTreeview}
     >
       <p className="text-[14px] truncate">{treeview.name}</p>
-      <Button type="submit" className="icon-button">
-        <Pencil
-          height={15}
-          width={15}
-          className="hidden group-hover:block  text-gray-900 ml-5"
-        />
-      </Button>
+      <Button
+    onClick={() => {
+      updateTreeview({
+        isSheetOpen: true,
+      });
+    }}
+      variant="ghost"
+      className="flex items-center justify-center p-2 h-full group transition duration-150 ease-in-out 
+                 hover:bg-gray-100  active:bg-gray-300 
+                 rounded outline-none w-10 "
+      aria-label="Edit"
+    >
+      <Pencil
+        className="hidden group-hover:block w-4 h-4 text-gray-600"
+        size={16}
+      />
+    </Button>
     </div>
   );
 };

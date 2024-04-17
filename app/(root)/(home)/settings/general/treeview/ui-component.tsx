@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Check, CirclePlus, SquareX } from "lucide-react";
+import { Check, CirclePlus, Pencil, SquareX } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { BeatLoader } from "react-spinners";
+import { SheetTrigger } from "@/components/ui/sheet";
+import { treeviewStore } from "@/store/settings";
 
 interface buttonProps {
   onAddClick: () => void;
@@ -117,3 +119,33 @@ export const Loader: React.FC = () => (
     <BeatLoader color="#253A79" />
   </div>
 );
+
+export const ButtonSheetTrigger = () => {
+  const updateTreeview = treeviewStore((state: any) => state.updateTreeview);
+  useEffect(() => {
+    updateTreeview({
+      isSheetOpen: false,
+    });
+  }, []);
+  return (
+    <SheetTrigger asChild>
+    <Button
+    onClick={() => {
+      updateTreeview({
+        isSheetOpen: true,
+      });
+    }}
+      variant="ghost"
+      className="flex items-center justify-center p-2 h-full group transition duration-150 ease-in-out 
+                 hover:bg-gray-100  active:bg-gray-300 
+                 rounded outline-none w-10 "
+      aria-label="Edit"
+    >
+      <Pencil
+        className="hidden group-hover:block w-4 h-4 text-gray-600"
+        size={16}
+      />
+    </Button>
+    </SheetTrigger>
+  )
+}

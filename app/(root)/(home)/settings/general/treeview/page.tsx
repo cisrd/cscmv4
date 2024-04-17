@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { saveTreeviewName } from "./action";
-import toast from "react-hot-toast";
 import { IState, initialState } from "./types";
 import CountryView from "./view-country";
 import ProjectView from "./view-project";
@@ -11,6 +9,10 @@ import SiteView from "./view-site";
 import SubstoreView from "./view-substore";
 import ProductionCenterView from "./view-production-center";
 import StorageView from "./view-storage";
+import { treeviewStore } from "@/store/settings";
+import FormTreeview from "./form";
+import SheetUi from "@/app/(root)/_components/ui/sheet-ui";
+import { ButtonSheetTrigger } from "./ui-component";
 
 interface TTreeview {
   id: number;
@@ -36,6 +38,10 @@ const variants = {
 };
 
 const TreeView = () => {
+
+  const treeviewZustand = treeviewStore((state: any) => state.treeview);
+  const updateTreeview = treeviewStore((state: any) => state.updateTreeview);
+
   const [treeviewState, setTreeviewState] = useState({
     isLoading: false,
     idCountry: 0,
@@ -130,51 +136,11 @@ const TreeView = () => {
     setSelectedProductionCenter(selectedSubstore);
   };
 
-  const actionSaveStorage = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const storageName = formData.get("storage");
-    const parentIDString = formData.get("parentID");
-    const parentID = parentIDString
-      ? parseInt(parentIDString as string)
-      : undefined;
-
-    const newData = {
-      name: typeof storageName === "string" ? storageName : undefined,
-      parentID: parentIDString ? parseInt(parentIDString as string) : undefined,
-    };
-
-    try {
-      const response = await saveTreeviewName(newData, 6);
-      if (response?.error) {
-        toast.error(response.error);
-      } else {
-        toast.success("Storage created with successfully!");
-        setSelectedSubstore((prevState) => {
-          if (!prevState || !response.data) return prevState; // Maintain the current state if null or response is faulty
-          const newStorage = { ...response.data, children: [] };
-          const updatedChildren = prevState.children
-            ? [...prevState.children, newStorage]
-            : [newStorage];
-          return { ...prevState, children: updatedChildren }; // Explicit structured update
-        });
-        setTreeviewState({ ...treeviewState, isNewStorage: false });
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
-    } finally {
-      fetchData();
-    }
-  };
-
   return (
     <div className="flex flex-col h-screen overflow-hidden">
       <div className="flex flex-1 bg-white p-3 rounded-s-sm">
         <div className="h-screen w-full grid grid-cols-5">
+
           {/* Country View */}
           <CountryView
             isNewCountry={treeviewState.isNewCountry}
