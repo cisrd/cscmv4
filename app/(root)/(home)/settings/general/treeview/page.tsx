@@ -16,6 +16,7 @@ import {
   HeaderTreeview,
 } from "./ui-component";
 import CountryView from "./country-view";
+import ProjectView from "./project-view";
 
 interface TTreeview {
   id: number;
@@ -135,24 +136,6 @@ const TreeView = () => {
       (productionCenter) => productionCenter.id === selectedId
     ) as TTreeview;
     setSelectedProductionCenter(selectedSubstore);
-  };
-
-  const actionSaveCountry = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const newCountry = {
-      name: formData.get("country"),
-    };
-
-    const response = await saveTreeviewName(newCountry, 1);
-
-    if (response?.error) {
-      toast.error(response.error);
-    } else {
-      toast.success("Country have been created with successfully!");
-      setTreeviewState({ ...treeviewState, isNewCountry: false });
-      fetchData();
-    }
   };
 
   const actionSaveProject = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -414,60 +397,18 @@ const TreeView = () => {
             fetchData={fetchData}
           />
           {/* End Country View */}
+          <ProjectView
+            isNewProject={treeviewState.isNewProject}
+            selectedProject={selectedProject}
+            treeviewStateData={treeviewStateData}
+            treeviewState={treeviewState}
+            setTreeviewStateData={setTreeviewStateData}
+            setTreeviewState={setTreeviewState}
+            handleSelectProject={handleSelectProject}
+          />
 
           {/* Project View */}
-          <div
-            className={`col-span-1 pl-2 border-r-2 border-gray-300 overflow-hidden ${
-              !treeviewStateData.selectedCountry && "hidden"
-            }`}
-          >
-            <div className="items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
-              {treeviewState.isNewProject ? (
-                <FormInputNewTreeview
-                  inputName="project"
-                  placeholder="Project name..."
-                  onSubmit={actionSaveProject}
-                  onCancel={() =>
-                    setTreeviewState({ ...treeviewState, isNewProject: false })
-                  }
-                  parentID={treeviewStateData.selectedCountry?.id}
-                />
-              ) : (
-                <>
-                  <div className="flex items-center justify-between font-semibold">
-                    <HeaderTreeview
-                      title="Project"
-                      count={
-                        treeviewStateData.selectedCountry?.children?.length || 0
-                      }
-                    />
-                    <ButtonNew
-                      onAddClick={() =>
-                        setTreeviewState({
-                          ...treeviewState,
-                          isNewProject: true,
-                        })
-                      }
-                    />
-                  </div>
-                </>
-              )}
-            </div>
 
-            <ScrollArea className=" h-[88%] pb-5 pr-1">
-              {treeviewStateData.selectedCountry &&
-                treeviewStateData.selectedCountry.children &&
-                treeviewStateData.selectedCountry.children.length > 0 &&
-                treeviewStateData.selectedCountry.children.map((project) => (
-                  <TreeviewWidget
-                    key={project.name}
-                    treeview={project}
-                    selectedBool={selectedProject?.id === project.id}
-                    onSelectTreeview={() => handleSelectProject(project.id)}
-                  />
-                ))}
-            </ScrollArea>
-          </div>
           {/* End Project View */}
 
           {/* Site View */}
