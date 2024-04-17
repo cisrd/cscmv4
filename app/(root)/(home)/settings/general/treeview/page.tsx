@@ -1,24 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import axios from "axios";
-import { motion } from "framer-motion";
 import BeatLoader from "react-spinners/BeatLoader";
 import { saveTreeviewName } from "./action";
 import toast from "react-hot-toast";
-import TreeviewWidget from "./treeview-widget";
 import { IState, initialState } from "./types";
-import {
-  ButtonNew,
-  FormInputNewCountry,
-  FormInputNewTreeview,
-  HeaderTreeview,
-} from "./ui-component";
 import CountryView from "./country-view";
 import ProjectView from "./project-view";
 import SiteView from "./site-view";
 import SubstoreView from "./substore-view";
+import ProductionCenterView from "./production-center-view";
+import StorageView from "./storage-view";
 
 interface TTreeview {
   id: number;
@@ -140,61 +133,6 @@ const TreeView = () => {
     setSelectedProductionCenter(selectedSubstore);
   };
 
-  const actionSaveProductionCenter = async (
-    event: React.FormEvent<HTMLFormElement>
-  ) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const productionCenterName = formData.get("production-center");
-    const parentIDString = formData.get("parentID");
-    const parentID = parentIDString
-      ? parseInt(parentIDString as string)
-      : undefined;
-
-    const newData = {
-      name:
-        typeof productionCenterName === "string"
-          ? productionCenterName
-          : undefined,
-      parentID: parentIDString ? parseInt(parentIDString as string) : undefined,
-    };
-
-    try {
-      const response = await saveTreeviewName(newData, 5);
-      if (response?.error) {
-        toast.error(response.error);
-      } else {
-        toast.success("Production Center created with successfully!");
-        if (treeviewStateData.selectedCountry) {
-          const newProductionCenter = response.data;
-
-          setSelectedSubstore((prevState) => {
-            if (!prevState) return prevState;
-
-            if (!newProductionCenter) return prevState;
-
-            return {
-              ...prevState,
-              children: prevState.children
-                ? [...prevState.children, newProductionCenter]
-                : [newProductionCenter],
-            };
-          });
-        }
-
-        setTreeviewState({ ...treeviewState, isNewProductionCenter: false });
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      } else {
-        console.log("An unexpected error occurred");
-      }
-    } finally {
-      fetchData();
-    }
-  };
-
   const actionSaveStorage = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -293,131 +231,32 @@ const TreeView = () => {
           />
           {/* End Substore View */}
 
-          {/* Production Center View */}
           <div className="flex flex-col h-screen">
-            <div
-              className={`flex-1 pl-2 border-r-2 border-gray-300 overflow-hidden ${
-                !selectedSubstore && "hidden"
-              }`}
-            >
-              <div className="items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
-                {treeviewState.isNewProductionCenter ? (
-                  <FormInputNewTreeview
-                    inputName="production-center"
-                    placeholder="Production Center name..."
-                    onSubmit={actionSaveProductionCenter}
-                    onCancel={() =>
-                      setTreeviewState({
-                        ...treeviewState,
-                        isNewProductionCenter: false,
-                      })
-                    }
-                    parentID={selectedSubstore?.id}
-                  />
-                ) : (
-                  <>
-                    <div className="flex items-center justify-between font-semibold">
-                      <HeaderTreeview
-                        title="Production Center"
-                        count={
-                          selectedSubstore?.children?.filter(
-                            (productionCenter) => productionCenter.level === 5
-                          ).length || 0
-                        }
-                      />
-                      <ButtonNew
-                        onAddClick={() =>
-                          setTreeviewState({
-                            ...treeviewState,
-                            isNewProductionCenter: true,
-                          })
-                        }
-                      />
-                    </div>
-                  </>
-                )}
-              </div>
-              {selectedSubstore &&
-                selectedSubstore.children &&
-                selectedSubstore.children.length > 0 &&
-                selectedSubstore.children
-                  .filter((productionCenter) => productionCenter.level === 5)
-                  .map((productionCenter) => (
-                    <TreeviewWidget
-                      key={productionCenter.name}
-                      treeview={productionCenter}
-                      selectedBool={
-                        selectedSubstore?.id === productionCenter.id
-                      }
-                      onSelectTreeview={() =>
-                        handleSelectProductionCenter(productionCenter.id)
-                      }
-                    />
-                  ))}
-            </div>
+            {/* Production Center View */}
+            <ProductionCenterView
+              isNewProductionCenter={treeviewState.isNewProductionCenter}
+              selectedSubstore={selectedSubstore}
+              fetchData={fetchData}
+              treeviewStateData={treeviewStateData}
+              setSelectedSubstore={setSelectedSubstore}
+              treeviewState={treeviewState}
+              setTreeviewState={setTreeviewState}
+              handleSelectProductionCenter={handleSelectProductionCenter}
+            />
             {/* End Production Center View */}
 
             {/* Storage View */}
-            <div
-              className={`flex-1 pl-2 border-r-2 border-gray-300 overflow-hidden ${
-                !selectedSubstore && "hidden"
-              }`}
-            >
-              <div className=" items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
-                {treeviewState.isNewStorage ? (
-                  <FormInputNewTreeview
-                    inputName="storage"
-                    placeholder="Storage name..."
-                    onSubmit={actionSaveStorage}
-                    onCancel={() =>
-                      setTreeviewState({
-                        ...treeviewState,
-                        isNewStorage: false,
-                      })
-                    }
-                    parentID={selectedSubstore?.id}
-                  />
-                ) : (
-                  <>
-                    <div className="flex items-center justify-between font-semibold">
-                      <HeaderTreeview
-                        title="Storage"
-                        count={
-                          selectedSubstore?.children?.filter(
-                            (productionCenter) => productionCenter.level === 6
-                          ).length || 0
-                        }
-                      />
-                      <ButtonNew
-                        onAddClick={() =>
-                          setTreeviewState({
-                            ...treeviewState,
-                            isNewStorage: true,
-                          })
-                        }
-                      />
-                    </div>
-                  </>
-                )}
-              </div>
-              {selectedSubstore &&
-                selectedSubstore.children &&
-                selectedSubstore.children.length > 0 &&
-                selectedSubstore.children
-                  .filter((storage) => storage.level === 6)
-                  .map((storage) => (
-                    <TreeviewWidget
-                      key={storage.name}
-                      treeview={storage}
-                      selectedBool={selectedSubstore?.id === storage.id}
-                      onSelectTreeview={() =>
-                        handleSelectProductionCenter(storage.id)
-                      }
-                    />
-                  ))}
-            </div>
+            <StorageView
+              isNewStorage={treeviewState.isNewStorage}
+              selectedSubstore={selectedSubstore}
+              fetchData={fetchData}
+              setSelectedSubstore={setSelectedSubstore}
+              treeviewState={treeviewState}
+              setTreeviewState={setTreeviewState}
+              handleSelectStorage={handleSelectProductionCenter}
+            />
+            {/* End Storage View */}
           </div>
-          {/* End Storage View */}
         </div>
       </div>
     </div>
