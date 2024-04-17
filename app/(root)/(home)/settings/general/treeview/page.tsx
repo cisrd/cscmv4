@@ -1,18 +1,21 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import axios from "axios";
 import { motion } from "framer-motion";
 import BeatLoader from "react-spinners/BeatLoader";
-import { Input } from "@/components/ui/input";
-import { Check, CirclePlus, SquareX } from "lucide-react";
 import { saveTreeviewName } from "./action";
 import toast from "react-hot-toast";
 import TreeviewWidget from "./treeview-widget";
 import { IState, initialState } from "./types";
-import { ButtonNew, HeaderTreeview } from "./ui-component";
+import {
+  ButtonNew,
+  FormInputNewCountry,
+  FormInputNewTreeview,
+  HeaderTreeview,
+} from "./ui-component";
+import CountryView from "./country-view";
 
 interface TTreeview {
   id: number;
@@ -86,6 +89,12 @@ const TreeView = () => {
     }
   };
 
+  useEffect(() => {
+    setTimeout(() => {
+      fetchData();
+    }, 500);
+  }, []);
+
   const handleSelectCountry = (selectedId: number) => {
     const selected = treeviewStateData.dataTreeview.find(
       (project) => project.id === selectedId
@@ -128,13 +137,9 @@ const TreeView = () => {
     setSelectedProductionCenter(selectedSubstore);
   };
 
-  useEffect(() => {
-    setTimeout(() => {
-      fetchData();
-    }, 500);
-  }, []);
-
-  const actionSaveCountry = async (formData: FormData) => {
+  const actionSaveCountry = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
     const newCountry = {
       name: formData.get("country"),
     };
@@ -150,7 +155,9 @@ const TreeView = () => {
     }
   };
 
-  const actionSaveProject = async (formData: FormData) => {
+  const actionSaveProject = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
     const projectName = formData.get("project");
     const parentIDString = formData.get("parentID");
     const parentID = parentIDString
@@ -194,7 +201,9 @@ const TreeView = () => {
     }
   };
 
-  const actionSaveSite = async (formData: FormData) => {
+  const actionSaveSite = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
     const projectName = formData.get("site");
     const parentIDString = formData.get("parentID");
     const parentID = parentIDString
@@ -241,7 +250,11 @@ const TreeView = () => {
     }
   };
 
-  const actionSaveSubstore = async (formData: FormData) => {
+  const actionSaveSubstore = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
     const substoreName = formData.get("substore");
     const parentIDString = formData.get("parentID");
     const parentID = parentIDString
@@ -289,7 +302,11 @@ const TreeView = () => {
     }
   };
 
-  const actionSaveProductionCenter = async (formData: FormData) => {
+  const actionSaveProductionCenter = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
     const productionCenterName = formData.get("production-center");
     const parentIDString = formData.get("parentID");
     const parentID = parentIDString
@@ -340,7 +357,9 @@ const TreeView = () => {
     }
   };
 
-  const actionSaveStorage = async (formData: FormData) => {
+  const actionSaveStorage = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
     const storageName = formData.get("storage");
     const parentIDString = formData.get("parentID");
     const parentID = parentIDString
@@ -394,36 +413,14 @@ const TreeView = () => {
           >
             <div className="items-center justify-between p-1 border-b border-gray-200 mr-2 font-semibold">
               {treeviewState.isNewCountry ? (
-                <form action={actionSaveCountry}>
-                  <div className="flex  space-x-2 items-center justify-end w-full">
-                    <Input
-                      name="country"
-                      type="text"
-                      placeholder="Country name..."
-                      className="w-full h-[30px] focus:ring-0 focus-visible:ring-1 capitalize"
-                    />
-                    <div className="ml-auto flex items-center">
-                      <button type="submit" className="icon-button">
-                        <Check
-                          height={25}
-                          width={25}
-                          className="cursor-pointer justify-end hover:bg-sidebar-background mr-1"
-                        />
-                      </button>
-                      <SquareX
-                        height={25}
-                        width={25}
-                        onClick={() =>
-                          setTreeviewState({
-                            ...treeviewState,
-                            isNewCountry: false,
-                          })
-                        }
-                        className="cursor-pointer hover:bg-sidebar-background"
-                      />
-                    </div>
-                  </div>
-                </form>
+                <FormInputNewCountry
+                  inputName="country"
+                  placeholder="Country name..."
+                  onSubmit={actionSaveCountry} // Define this function in your component logic
+                  onCancel={() =>
+                    setTreeviewState({ ...treeviewState, isNewCountry: false })
+                  }
+                />
               ) : (
                 <>
                   <div className="flex items-center justify-between font-semibold">
@@ -475,41 +472,15 @@ const TreeView = () => {
           >
             <div className="items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
               {treeviewState.isNewProject ? (
-                <form action={actionSaveProject}>
-                  <input
-                    type="hidden"
-                    name="parentID"
-                    value={treeviewStateData.selectedCountry?.id}
-                  ></input>
-                  <div className="flex  space-x-2 items-center justify-end w-full">
-                    <Input
-                      name="project"
-                      type="text"
-                      placeholder="Project name..."
-                      className="w-full h-[30px] focus:ring-0 focus-visible:ring-1 capitalize"
-                    />
-                    <div className="ml-auto flex items-center">
-                      <button type="submit" className="icon-button">
-                        <Check
-                          height={25}
-                          width={25}
-                          className="cursor-pointer justify-end hover:bg-sidebar-background mr-1"
-                        />
-                      </button>
-                      <SquareX
-                        height={25}
-                        width={25}
-                        onClick={() =>
-                          setTreeviewState({
-                            ...treeviewState,
-                            isNewProject: false,
-                          })
-                        }
-                        className="cursor-pointer hover:bg-sidebar-background"
-                      />
-                    </div>
-                  </div>
-                </form>
+                <FormInputNewTreeview
+                  inputName="project"
+                  placeholder="Project name..."
+                  onSubmit={actionSaveProject}
+                  onCancel={() =>
+                    setTreeviewState({ ...treeviewState, isNewProject: false })
+                  }
+                  parentID={treeviewStateData.selectedCountry?.id}
+                />
               ) : (
                 <>
                   <div className="flex items-center justify-between font-semibold">
@@ -556,41 +527,15 @@ const TreeView = () => {
           >
             <div className="items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
               {treeviewState.isNewSite ? (
-                <form action={actionSaveSite}>
-                  <input
-                    type="hidden"
-                    name="parentID"
-                    value={selectedProject?.id}
-                  ></input>
-                  <div className="flex  space-x-2 items-center justify-end w-full">
-                    <Input
-                      name="site"
-                      type="text"
-                      placeholder="Site name..."
-                      className="w-full h-[30px] focus:ring-0 focus-visible:ring-1 capitalize"
-                    />
-                    <div className="ml-auto flex items-center">
-                      <button type="submit" className="icon-button">
-                        <Check
-                          height={25}
-                          width={25}
-                          className="cursor-pointer justify-end hover:bg-sidebar-background mr-1"
-                        />
-                      </button>
-                      <SquareX
-                        height={25}
-                        width={25}
-                        onClick={() =>
-                          setTreeviewState({
-                            ...treeviewState,
-                            isNewSite: false,
-                          })
-                        }
-                        className="cursor-pointer hover:bg-sidebar-background"
-                      />
-                    </div>
-                  </div>
-                </form>
+                <FormInputNewTreeview
+                  inputName="site"
+                  placeholder="Site name..."
+                  onSubmit={actionSaveSite}
+                  onCancel={() =>
+                    setTreeviewState({ ...treeviewState, isNewSite: false })
+                  }
+                  parentID={selectedProject?.id}
+                />
               ) : (
                 <>
                   <div className="flex items-center justify-between font-semibold">
@@ -635,41 +580,15 @@ const TreeView = () => {
           >
             <div className="items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
               {treeviewState.isNewSubstore ? (
-                <form action={actionSaveSubstore}>
-                  <input
-                    type="hidden"
-                    name="parentID"
-                    value={selectedSite?.id}
-                  ></input>
-                  <div className="flex  space-x-2 items-center justify-end w-full">
-                    <Input
-                      name="substore"
-                      type="text"
-                      placeholder="Sub-store name..."
-                      className="w-full h-[30px] focus:ring-0 focus-visible:ring-1 capitalize"
-                    />
-                    <div className="ml-auto flex items-center">
-                      <button type="submit" className="icon-button">
-                        <Check
-                          height={25}
-                          width={25}
-                          className="cursor-pointer justify-end hover:bg-sidebar-background mr-1"
-                        />
-                      </button>
-                      <SquareX
-                        height={25}
-                        width={25}
-                        onClick={() =>
-                          setTreeviewState({
-                            ...treeviewState,
-                            isNewSubstore: false,
-                          })
-                        }
-                        className="cursor-pointer hover:bg-sidebar-background"
-                      />
-                    </div>
-                  </div>
-                </form>
+                <FormInputNewTreeview
+                  inputName="substore"
+                  placeholder="Sub-store name..."
+                  onSubmit={actionSaveSubstore}
+                  onCancel={() =>
+                    setTreeviewState({ ...treeviewState, isNewSubstore: false })
+                  }
+                  parentID={selectedSite?.id}
+                />
               ) : (
                 <>
                   <div className="flex items-center justify-between font-semibold">
@@ -714,41 +633,18 @@ const TreeView = () => {
             >
               <div className="items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
                 {treeviewState.isNewProductionCenter ? (
-                  <form action={actionSaveProductionCenter}>
-                    <input
-                      type="hidden"
-                      name="parentID"
-                      value={selectedSubstore?.id}
-                    ></input>
-                    <div className="flex  space-x-2 items-center justify-end w-full">
-                      <Input
-                        name="production-center"
-                        type="text"
-                        placeholder="Production Center name..."
-                        className="w-full h-[30px] focus:ring-0 focus-visible:ring-1 capitalize"
-                      />
-                      <div className="ml-auto flex items-center">
-                        <button type="submit" className="icon-button">
-                          <Check
-                            height={25}
-                            width={25}
-                            className="cursor-pointer justify-end hover:bg-sidebar-background mr-1"
-                          />
-                        </button>
-                        <SquareX
-                          height={25}
-                          width={25}
-                          onClick={() =>
-                            setTreeviewState({
-                              ...treeviewState,
-                              isNewProductionCenter: false,
-                            })
-                          }
-                          className="cursor-pointer hover:bg-sidebar-background"
-                        />
-                      </div>
-                    </div>
-                  </form>
+                  <FormInputNewTreeview
+                    inputName="production-center"
+                    placeholder="Production Center name..."
+                    onSubmit={actionSaveProductionCenter}
+                    onCancel={() =>
+                      setTreeviewState({
+                        ...treeviewState,
+                        isNewProductionCenter: false,
+                      })
+                    }
+                    parentID={selectedSubstore?.id}
+                  />
                 ) : (
                   <>
                     <div className="flex items-center justify-between font-semibold">
@@ -800,41 +696,18 @@ const TreeView = () => {
             >
               <div className=" items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
                 {treeviewState.isNewStorage ? (
-                  <form action={actionSaveStorage}>
-                    <input
-                      type="hidden"
-                      name="parentID"
-                      value={selectedSubstore?.id}
-                    ></input>
-                    <div className="flex  space-x-2 items-center justify-end w-full">
-                      <Input
-                        name="storage"
-                        type="text"
-                        placeholder="Storage name..."
-                        className="w-full h-[30px] focus:ring-0 focus-visible:ring-1 capitalize"
-                      />
-                      <div className="ml-auto flex items-center">
-                        <button type="submit" className="icon-button">
-                          <Check
-                            height={25}
-                            width={25}
-                            className="cursor-pointer justify-end hover:bg-sidebar-background mr-1"
-                          />
-                        </button>
-                        <SquareX
-                          height={25}
-                          width={25}
-                          onClick={() =>
-                            setTreeviewState({
-                              ...treeviewState,
-                              isNewStorage: false,
-                            })
-                          }
-                          className="cursor-pointer hover:bg-sidebar-background"
-                        />
-                      </div>
-                    </div>
-                  </form>
+                  <FormInputNewTreeview
+                    inputName="storage"
+                    placeholder="Storage name..."
+                    onSubmit={actionSaveStorage}
+                    onCancel={() =>
+                      setTreeviewState({
+                        ...treeviewState,
+                        isNewStorage: false,
+                      })
+                    }
+                    parentID={selectedSubstore?.id}
+                  />
                 ) : (
                   <>
                     <div className="flex items-center justify-between font-semibold">

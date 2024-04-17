@@ -55,33 +55,4 @@ export const saveTreeviewName = async (
       error: errorMessage,
     };
   }
-
-  // try {
-  //   const createdTreeview = await prisma.tTreeview.create({
-  //     data: {
-  //       name: result.data.name,
-  //       parentId: result.data.parentID,
-  //       level: levelNumber,
-  //       isFm: false,
-  //       adresse: "",
-  //       projectCode: "",
-  //       codeAnalytic: "",
-  //     },
-  //   });
-  //   revalidatePath("/settings/general/treeview");
-  //   return {
-  //     error: null,
-  //     data: createdTreeview,
-  //   };
-  // } catch (errorCatch: unknown) {
-  //   let errorMessage = "Error please contact the support!";
-
-  //   if (errorCatch instanceof Error) {
-  //     errorMessage = `Database error: ${errorCatch.message}`;
-  //   }
-
-  //   return {
-  //     error: errorMessage,
-  //   };
-  // }
 };
