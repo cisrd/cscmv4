@@ -2,16 +2,15 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import BeatLoader from "react-spinners/BeatLoader";
 import { saveTreeviewName } from "./action";
 import toast from "react-hot-toast";
 import { IState, initialState } from "./types";
-import CountryView from "./country-view";
-import ProjectView from "./project-view";
-import SiteView from "./site-view";
-import SubstoreView from "./substore-view";
-import ProductionCenterView from "./production-center-view";
-import StorageView from "./storage-view";
+import CountryView from "./view-country";
+import ProjectView from "./view-project";
+import SiteView from "./view-site";
+import SubstoreView from "./view-substore";
+import ProductionCenterView from "./view-production-center";
+import StorageView from "./view-storage";
 
 interface TTreeview {
   id: number;
@@ -61,9 +60,7 @@ const TreeView = () => {
   const [selectedSubstore, setSelectedSubstore] = useState<TTreeview | null>(
     null
   );
-  const [selectedStorage, setSelectedStorage] = useState<TTreeview | null>(
-    null
-  );
+
   const [selectedProductionCenter, setSelectedProductionCenter] =
     useState<TTreeview | null>(null);
 
