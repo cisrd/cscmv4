@@ -12,6 +12,7 @@ import { saveTreeviewName } from "./action";
 import toast from "react-hot-toast";
 import TreeviewWidget from "./treeview-widget";
 import { IState, initialState } from "./types";
+import { ButtonNew, HeaderTreeview } from "./ui-component";
 
 interface TTreeview {
   id: number;
@@ -30,8 +31,6 @@ interface TTreeview {
   parent?: TTreeview;
 }
 
-
-
 const variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1 },
@@ -39,10 +38,9 @@ const variants = {
 };
 
 const TreeView = () => {
-
   const [treeviewState, setTreeviewState] = useState({
     isLoading: false,
-    idCountry : 0,
+    idCountry: 0,
     savingCountry: false,
     savingProject: false,
     savingSite: false,
@@ -54,7 +52,8 @@ const TreeView = () => {
     isNewProductionCenter: false,
   });
 
-  const [treeviewStateData, setTreeviewStateData] = useState<IState>(initialState);
+  const [treeviewStateData, setTreeviewStateData] =
+    useState<IState>(initialState);
 
   const [selectedProject, setSelectedProject] = useState<TTreeview | null>(
     null
@@ -74,7 +73,10 @@ const TreeView = () => {
       const response = await axios.get<TTreeview[]>(
         "/api/settings/general/treeview"
       );
-      setTreeviewStateData({...treeviewStateData, dataTreeview: response.data });
+      setTreeviewStateData({
+        ...treeviewStateData,
+        dataTreeview: response.data,
+      });
     } catch (error: any) {
       if (axios.isAxiosError(error)) {
         console.error("API Error:", error.message);
@@ -91,7 +93,7 @@ const TreeView = () => {
     setSelectedProject(null);
     setSelectedSite(null);
     setSelectedSubstore(null);
-    setTreeviewStateData({...treeviewStateData, selectedCountry: selected });
+    setTreeviewStateData({ ...treeviewStateData, selectedCountry: selected });
   };
 
   const handleSelectProject = (selectedId: number) => {
@@ -112,7 +114,6 @@ const TreeView = () => {
   };
 
   const handleSelectSubstore = (selectedId: number) => {
-    
     const selected = selectedSite?.children?.find(
       (substore) => substore.id === selectedId
     ) as TTreeview;
@@ -120,7 +121,7 @@ const TreeView = () => {
   };
 
   const handleSelectProductionCenter = (selectedId: number) => {
-    fetchData(); 
+    fetchData();
     const selected = selectedSubstore?.children?.find(
       (productionCenter) => productionCenter.id === selectedId
     ) as TTreeview;
@@ -134,7 +135,6 @@ const TreeView = () => {
   }, []);
 
   const actionSaveCountry = async (formData: FormData) => {
-
     const newCountry = {
       name: formData.get("country"),
     };
@@ -151,7 +151,6 @@ const TreeView = () => {
   };
 
   const actionSaveProject = async (formData: FormData) => {
-
     const projectName = formData.get("project");
     const parentIDString = formData.get("parentID");
     const parentID = parentIDString
@@ -170,10 +169,9 @@ const TreeView = () => {
       } else {
         toast.success("Project has been created with successfully!");
 
-        setTreeviewStateData(prevState => {
-          
+        setTreeviewStateData((prevState) => {
           if (!prevState || !response.data) return prevState;
-          const updatedData = prevState.dataTreeview.map(country => {
+          const updatedData = prevState.dataTreeview.map((country) => {
             if (country.id === parentID) {
               const newProjects = [...(country.children || []), response.data];
               console.log(newProjects);
@@ -193,12 +191,10 @@ const TreeView = () => {
         console.log("An unexpected error occurred");
       }
     } finally {
-      
     }
   };
 
   const actionSaveSite = async (formData: FormData) => {
-
     const projectName = formData.get("site");
     const parentIDString = formData.get("parentID");
     const parentID = parentIDString
@@ -246,7 +242,6 @@ const TreeView = () => {
   };
 
   const actionSaveSubstore = async (formData: FormData) => {
-
     const substoreName = formData.get("substore");
     const parentIDString = formData.get("parentID");
     const parentID = parentIDString
@@ -295,7 +290,6 @@ const TreeView = () => {
   };
 
   const actionSaveProductionCenter = async (formData: FormData) => {
-
     const productionCenterName = formData.get("production-center");
     const parentIDString = formData.get("parentID");
     const parentID = parentIDString
@@ -303,7 +297,10 @@ const TreeView = () => {
       : undefined;
 
     const newData = {
-      name: typeof productionCenterName === "string" ? productionCenterName : undefined,
+      name:
+        typeof productionCenterName === "string"
+          ? productionCenterName
+          : undefined,
       parentID: parentIDString ? parseInt(parentIDString as string) : undefined,
     };
 
@@ -344,7 +341,6 @@ const TreeView = () => {
   };
 
   const actionSaveStorage = async (formData: FormData) => {
-
     const storageName = formData.get("storage");
     const parentIDString = formData.get("parentID");
     const parentID = parentIDString
@@ -362,10 +358,12 @@ const TreeView = () => {
         toast.error(response.error);
       } else {
         toast.success("Storage created with successfully!");
-        setSelectedSubstore(prevState => {
+        setSelectedSubstore((prevState) => {
           if (!prevState || !response.data) return prevState; // Maintain the current state if null or response is faulty
           const newStorage = { ...response.data, children: [] };
-          const updatedChildren = prevState.children ? [...prevState.children, newStorage] : [newStorage];
+          const updatedChildren = prevState.children
+            ? [...prevState.children, newStorage]
+            : [newStorage];
           return { ...prevState, children: updatedChildren }; // Explicit structured update
         });
         setTreeviewState({ ...treeviewState, isNewStorage: false });
@@ -394,7 +392,7 @@ const TreeView = () => {
             transition={{ duration: 1 }}
             className="col-span-1 border-r-2 border-gray-300 overflow-hidden"
           >
-            <div className="items-center justify-between p-1 border-b border-gray-200 mr-3 font-semibold">
+            <div className="items-center justify-between p-1 border-b border-gray-200 mr-2 font-semibold">
               {treeviewState.isNewCountry ? (
                 <form action={actionSaveCountry}>
                   <div className="flex  space-x-2 items-center justify-end w-full">
@@ -429,17 +427,18 @@ const TreeView = () => {
               ) : (
                 <>
                   <div className="flex items-center justify-between font-semibold">
-                    <p>Country ({treeviewStateData.dataTreeview?.length || 0})</p>
-                    <Button
-                      variant="ghost"
-                      onClick={() =>
+                    <HeaderTreeview
+                      title="Country"
+                      count={treeviewStateData.dataTreeview?.length || 0}
+                    />
+                    <ButtonNew
+                      onAddClick={() =>
                         setTreeviewState({
                           ...treeviewState,
                           isNewCountry: true,
                         })
                       }
-                    ><CirclePlus height={25} width={25}/>
-                    </Button>
+                    />
                   </div>
                 </>
               )}
@@ -457,7 +456,9 @@ const TreeView = () => {
                     key={data.name}
                     treeview={data}
                     selectedBool={
-                      treeviewStateData.selectedCountry?.id === data.id ? true : false
+                      treeviewStateData.selectedCountry?.id === data.id
+                        ? true
+                        : false
                     }
                     onSelectTreeview={() => handleSelectCountry(data.id)}
                   />
@@ -512,18 +513,20 @@ const TreeView = () => {
               ) : (
                 <>
                   <div className="flex items-center justify-between font-semibold">
-                    <p>Project ({treeviewStateData.selectedCountry?.children?.length || 0})</p>
-                    <Button
-                      variant="outline"
-                      onClick={() =>
+                    <HeaderTreeview
+                      title="Project"
+                      count={
+                        treeviewStateData.selectedCountry?.children?.length || 0
+                      }
+                    />
+                    <ButtonNew
+                      onAddClick={() =>
                         setTreeviewState({
                           ...treeviewState,
                           isNewProject: true,
                         })
                       }
-                    >
-                      New
-                    </Button>
+                    />
                   </div>
                 </>
               )}
@@ -591,15 +594,18 @@ const TreeView = () => {
               ) : (
                 <>
                   <div className="flex items-center justify-between font-semibold">
-                    <p>Site ({selectedProject?.children?.length || 0})</p>
-                    <Button
-                      variant="outline"
-                      onClick={() =>
-                        setTreeviewState({ ...treeviewState, isNewSite: true })
+                    <HeaderTreeview
+                      title="Site"
+                      count={selectedProject?.children?.length || 0}
+                    />
+                    <ButtonNew
+                      onAddClick={() =>
+                        setTreeviewState({
+                          ...treeviewState,
+                          isNewSite: true,
+                        })
                       }
-                    >
-                      New
-                    </Button>
+                    />
                   </div>
                 </>
               )}
@@ -667,18 +673,18 @@ const TreeView = () => {
               ) : (
                 <>
                   <div className="flex items-center justify-between font-semibold">
-                    <p>Sub-Store ({selectedSite?.children?.length || 0})</p>
-                    <Button
-                      variant="outline"
-                      onClick={() =>
+                    <HeaderTreeview
+                      title="Sub-Store"
+                      count={selectedSite?.children?.length || 0}
+                    />
+                    <ButtonNew
+                      onAddClick={() =>
                         setTreeviewState({
                           ...treeviewState,
                           isNewSubstore: true,
                         })
                       }
-                    >
-                      New
-                    </Button>
+                    />
                   </div>
                 </>
               )}
@@ -746,24 +752,22 @@ const TreeView = () => {
                 ) : (
                   <>
                     <div className="flex items-center justify-between font-semibold">
-                      <p>
-                        Production Center (
-                        {selectedSubstore?.children?.filter(
-                          (productionCenter) => productionCenter.level === 5
-                        ).length || 0}
-                        )
-                      </p>
-                      <Button
-                        variant="outline"
-                        onClick={() =>
+                      <HeaderTreeview
+                        title="Production Center"
+                        count={
+                          selectedSubstore?.children?.filter(
+                            (productionCenter) => productionCenter.level === 5
+                          ).length || 0
+                        }
+                      />
+                      <ButtonNew
+                        onAddClick={() =>
                           setTreeviewState({
                             ...treeviewState,
                             isNewProductionCenter: true,
                           })
                         }
-                      >
-                        New
-                      </Button>
+                      />
                     </div>
                   </>
                 )}
@@ -834,24 +838,22 @@ const TreeView = () => {
                 ) : (
                   <>
                     <div className="flex items-center justify-between font-semibold">
-                      <p>
-                        Storage (
-                        {selectedSubstore?.children?.filter(
-                          (productionCenter) => productionCenter.level === 6
-                        ).length || 0}
-                        )
-                      </p>
-                      <Button
-                        variant="outline"
-                        onClick={() =>
+                      <HeaderTreeview
+                        title="Storage"
+                        count={
+                          selectedSubstore?.children?.filter(
+                            (productionCenter) => productionCenter.level === 6
+                          ).length || 0
+                        }
+                      />
+                      <ButtonNew
+                        onAddClick={() =>
                           setTreeviewState({
                             ...treeviewState,
                             isNewStorage: true,
                           })
                         }
-                      >
-                        New
-                      </Button>
+                      />
                     </div>
                   </>
                 )}
