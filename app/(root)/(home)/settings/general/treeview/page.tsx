@@ -394,7 +394,7 @@ const TreeView = () => {
             transition={{ duration: 1 }}
             className="col-span-1 border-r-2 border-gray-300 overflow-hidden"
           >
-            <div className="items-center justify-between p-1 border-b border-gray-200 mr-3 font-semibold">
+            <div className="items-center justify-between p-1 border-b border-gray-200 mr-2 font-semibold">
               {treeviewState.isNewCountry ? (
                 <form action={actionSaveCountry}>
                   <div className="flex  space-x-2 items-center justify-end w-full">
@@ -429,16 +429,17 @@ const TreeView = () => {
               ) : (
                 <>
                   <div className="flex items-center justify-between font-semibold">
-                    <p>Country ({treeviewStateData.dataTreeview?.length || 0})</p>
+                    <p className="text-[15px]">Country ({treeviewStateData.dataTreeview?.length || 0})</p>
                     <Button
                       variant="ghost"
+                      className="pr-2 pl-2 m-0"
                       onClick={() =>
                         setTreeviewState({
                           ...treeviewState,
                           isNewCountry: true,
                         })
                       }
-                    ><CirclePlus height={25} width={25}/>
+                    ><CirclePlus height={20} width={20}/>
                     </Button>
                   </div>
                 </>
@@ -472,7 +473,7 @@ const TreeView = () => {
               !treeviewStateData.selectedCountry && "hidden"
             }`}
           >
-            <div className="items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
+            <div className="items-center justify-between p-1 border-b border-gray-00 mr-2 font-semibold">
               {treeviewState.isNewProject ? (
                 <form action={actionSaveProject}>
                   <input
@@ -512,9 +513,10 @@ const TreeView = () => {
               ) : (
                 <>
                   <div className="flex items-center justify-between font-semibold">
-                    <p>Project ({treeviewStateData.selectedCountry?.children?.length || 0})</p>
+                    <p className="text-[15px]">Project ({treeviewStateData.selectedCountry?.children?.length || 0})</p>
                     <Button
-                      variant="outline"
+                      variant="ghost"
+                      className="pr-2 pl-2 m-0"
                       onClick={() =>
                         setTreeviewState({
                           ...treeviewState,
@@ -522,7 +524,7 @@ const TreeView = () => {
                         })
                       }
                     >
-                      New
+                      <CirclePlus height={20} width={20}/>
                     </Button>
                   </div>
                 </>
@@ -551,7 +553,7 @@ const TreeView = () => {
               !selectedProject && "hidden"
             }`}
           >
-            <div className="items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
+            <div className="items-center justify-between p-1 border-b border-gray-200 mr-2 font-semibold">
               {treeviewState.isNewSite ? (
                 <form action={actionSaveSite}>
                   <input
@@ -591,14 +593,15 @@ const TreeView = () => {
               ) : (
                 <>
                   <div className="flex items-center justify-between font-semibold">
-                    <p>Site ({selectedProject?.children?.length || 0})</p>
+                    <p className="text-[15px]">Site ({selectedProject?.children?.length || 0})</p>
                     <Button
-                      variant="outline"
+                      variant="ghost"
+                      className="pr-2 pl-2 m-0"
                       onClick={() =>
                         setTreeviewState({ ...treeviewState, isNewSite: true })
                       }
                     >
-                      New
+                      <CirclePlus height={20} width={20}/>
                     </Button>
                   </div>
                 </>
@@ -627,7 +630,7 @@ const TreeView = () => {
               !selectedSite && "hidden"
             }`}
           >
-            <div className="items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
+            <div className="items-center justify-between p-1 border-b border-gray-200 mr-2 font-semibold">
               {treeviewState.isNewSubstore ? (
                 <form action={actionSaveSubstore}>
                   <input
@@ -667,9 +670,10 @@ const TreeView = () => {
               ) : (
                 <>
                   <div className="flex items-center justify-between font-semibold">
-                    <p>Sub-Store ({selectedSite?.children?.length || 0})</p>
+                    <p className="text-[15px]">Sub-Store ({selectedSite?.children?.length || 0})</p>
                     <Button
-                      variant="outline"
+                      variant="ghost"
+                      className="pr-2 pl-2 m-0"
                       onClick={() =>
                         setTreeviewState({
                           ...treeviewState,
@@ -677,7 +681,7 @@ const TreeView = () => {
                         })
                       }
                     >
-                      New
+                      <CirclePlus height={20} width={20}/>
                     </Button>
                   </div>
                 </>
@@ -706,7 +710,7 @@ const TreeView = () => {
                 !selectedSubstore && "hidden"
               }`}
             >
-              <div className="items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
+              <div className="items-center justify-between p-1 border-b border-gray-200 mr-2 font-semibold">
                 {treeviewState.isNewProductionCenter ? (
                   <form action={actionSaveProductionCenter}>
                     <input
@@ -746,7 +750,7 @@ const TreeView = () => {
                 ) : (
                   <>
                     <div className="flex items-center justify-between font-semibold">
-                      <p>
+                      <p className="text-[15px]">
                         Production Center (
                         {selectedSubstore?.children?.filter(
                           (productionCenter) => productionCenter.level === 5
@@ -754,7 +758,8 @@ const TreeView = () => {
                         )
                       </p>
                       <Button
-                        variant="outline"
+                        variant="ghost"
+                        className="pr-2 pl-2 m-0"
                         onClick={() =>
                           setTreeviewState({
                             ...treeviewState,
@@ -762,7 +767,7 @@ const TreeView = () => {
                           })
                         }
                       >
-                        New
+                        <CirclePlus height={20} width={20}/>
                       </Button>
                     </div>
                   </>
@@ -794,7 +799,7 @@ const TreeView = () => {
                 !selectedSubstore && "hidden"
               }`}
             >
-              <div className=" items-center justify-between p-1 border-b border-gray-00 mr-3 font-semibold">
+              <div className=" items-center justify-between p-1 border-b border-gray-200 mr-2 font-semibold">
                 {treeviewState.isNewStorage ? (
                   <form action={actionSaveStorage}>
                     <input
@@ -834,7 +839,7 @@ const TreeView = () => {
                 ) : (
                   <>
                     <div className="flex items-center justify-between font-semibold">
-                      <p>
+                      <p className="text-[15px]">
                         Storage (
                         {selectedSubstore?.children?.filter(
                           (productionCenter) => productionCenter.level === 6
@@ -842,7 +847,8 @@ const TreeView = () => {
                         )
                       </p>
                       <Button
-                        variant="outline"
+                        variant="ghost"
+                        className="pr-2 pl-2 m-0"
                         onClick={() =>
                           setTreeviewState({
                             ...treeviewState,
@@ -850,7 +856,7 @@ const TreeView = () => {
                           })
                         }
                       >
-                        New
+                        <CirclePlus height={20} width={20}/>
                       </Button>
                     </div>
                   </>
