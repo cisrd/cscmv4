@@ -17,23 +17,9 @@ import { Menu } from "@mantine/core";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import axios from "axios";
 import { mkConfig, generateCsv, download } from "export-to-csv";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import SheetTriggerButton from "../../product/product-list/sheet-trigger-button";
 import SheetUi from "@/app/(root)/_components/ui/sheet-ui";
-import FileUpload from "@/app/(root)/_components/ui/file-upload-ui";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import FormSupplier from "./form";
-import { saveSupplier } from "./action";
 import { supplierStore } from "@/store/supplier";
 
 const csvConfig = mkConfig({

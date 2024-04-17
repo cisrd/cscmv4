@@ -20,7 +20,6 @@ const TreeviewWidget: React.FC<TreeviewWidgetProps> = ({
   selectedBool,
   onSelectTreeview,
 }) => {
-
   const treeviewZustand = treeviewStore((state: any) => state.treeviewZustand);
   const updateTreeview = treeviewStore((state: any) => state.updateTreeview);
 
@@ -38,22 +37,23 @@ const TreeviewWidget: React.FC<TreeviewWidgetProps> = ({
     >
       <p className="text-[14px] truncate">{treeview.name}</p>
       <Button
-    onClick={() => {
-      updateTreeview({
-        isSheetOpen: true,
-      });
-    }}
-      variant="ghost"
-      className="flex items-center justify-center p-2 h-full group transition duration-150 ease-in-out 
+        onClick={() => {
+          updateTreeview({
+            isSheetOpen: true,
+            treeviewData:treeview
+          });
+        }}
+        variant="ghost"
+        className="flex items-center justify-center p-2 h-full group transition duration-150 ease-in-out 
                  hover:bg-gray-100  active:bg-gray-300 
                  rounded outline-none w-10 "
-      aria-label="Edit"
-    >
-      <Pencil
-        className="hidden group-hover:block w-4 h-4 text-gray-600"
-        size={16}
-      />
-    </Button>
+        aria-label="Edit"
+      >
+        <Pencil
+          className="hidden group-hover:block w-4 h-4 text-gray-600"
+          size={16}
+        />
+      </Button>
     </div>
   );
 };
