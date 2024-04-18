@@ -1,11 +1,8 @@
 "use client";
 
 import { Pencil } from "lucide-react";
-import { TTreeview } from "@prisma/client";
+import { TTreeview } from "./types";
 import { Button } from "@/components/ui/button";
-import SheetUi from "@/app/(root)/_components/ui/sheet-ui";
-import FormTreeview from "./form";
-import { ButtonSheetTrigger } from "./ui-component";
 import { treeviewStore } from "@/store/settings";
 
 interface TreeviewWidgetProps {
@@ -40,7 +37,7 @@ const TreeviewWidget: React.FC<TreeviewWidgetProps> = ({
         onClick={() => {
           updateTreeview({
             isSheetOpen: true,
-            treeviewData:treeview
+            treeviewData: treeview,
           });
         }}
         variant="ghost"

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { IState, initialState } from "./types";
+import { IState, TTreeview, initialState } from "./types";
 import CountryView from "./view-country";
 import ProjectView from "./view-project";
 import SiteView from "./view-site";
@@ -14,23 +14,6 @@ import { treeviewStore } from "@/store/settings";
 import { Button, Drawer, Input, Space } from "antd";
 import { Label } from "@/components/ui/label";
 import FormTreeview from "./form";
-
-interface TTreeview {
-  id: number;
-  name: string;
-  parentId: number | null;
-  isFm: boolean;
-  level: number | null;
-  adresse: string | null;
-  projectCode: string | null;
-  codeAnalytic: string | null;
-  createdBy: string | null;
-  createdAt: Date | null;
-  updatedAt: Date | null;
-  updatedBy: string | null;
-  children?: TTreeview[];
-  parent?: TTreeview;
-}
 
 const variants = {
   hidden: { opacity: 0 },
@@ -147,12 +130,11 @@ const TreeView = () => {
   const updateTreeview = treeviewStore((state: any) => state.updateTreeview);
 
   return (
-    
     <div className="flex flex-col h-screen overflow-hidden">
       <div className="flex flex-1 bg-white p-3 rounded-s-sm">
         <div className="h-screen w-full grid grid-cols-5">
           {/* Country View */}
-          <FormTreeview/>
+          <FormTreeview />
           <CountryView
             isNewCountry={treeviewState.isNewCountry}
             isLoading={treeviewState.isLoading}
@@ -163,7 +145,7 @@ const TreeView = () => {
             treeviewState={treeviewState}
             fetchData={fetchData}
           />
-          
+
           {/* End Country View */}
 
           {/* Project View */}
