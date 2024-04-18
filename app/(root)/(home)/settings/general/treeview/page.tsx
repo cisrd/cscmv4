@@ -134,7 +134,10 @@ const TreeView = () => {
       <div className="flex flex-1 bg-white p-3 rounded-s-sm">
         <div className="h-screen w-full grid grid-cols-5">
           {/* Country View */}
-          <FormTreeview />
+          <FormTreeview
+            treeviewStateData={treeviewStateData}
+            fetchData={fetchData}
+          />
           <CountryView
             isNewCountry={treeviewState.isNewCountry}
             isLoading={treeviewState.isLoading}

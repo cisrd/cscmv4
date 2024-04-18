@@ -7,8 +7,17 @@ import { Button } from "@/components/ui/button";
 import FormField from "./form-field";
 import { updateTreeviewAction } from "./action";
 import toast from "react-hot-toast";
+import { IState } from "./types";
 
-const FormTreeview = () => {
+interface dataProps {
+  treeviewStateData: IState;
+  fetchData: () => void;
+}
+
+const FormTreeview: React.FC<dataProps> = ({
+  treeviewStateData,
+  fetchData,
+}) => {
   const { treeviewData, isSheetOpen, updateTreeview } = treeviewStore(
     (state: any) => ({
       treeviewData: state.treeviewZustand.treeviewData,
@@ -47,6 +56,7 @@ const FormTreeview = () => {
     } else {
       toast.success("Treeview have been saved with successfully!");
       updateTreeview({ isSheetOpen: false });
+      fetchData();
     }
   };
 
