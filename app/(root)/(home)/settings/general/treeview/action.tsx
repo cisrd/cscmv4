@@ -64,7 +64,7 @@ export const saveTreeviewName = async (
   }
 };
 
-export const updateTreeviewAction = async (treeviewName: any) => {
+export async function updateTreeviewAction (treeviewName: any) {
   const result = treeviewSchema.safeParse(treeviewName);
   if (!result.success) {
     let errorMessage = "";

@@ -18,5 +18,5 @@ export const treeviewSchema = z.object({
   poFooter: z.string().nullable().optional(),
   poEmailBody: z.string().nullable().optional(),
   poCcEmail: z.string().nullable().optional(),
-  isActivated: z.boolean(),
+  isActivated: z.boolean().optional(),
 });

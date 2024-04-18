@@ -1,4 +1,6 @@
-import React, { ChangeEvent, FormEvent } from "react";
+"use client";
+
+import React, { ChangeEvent, useCallback, useState } from "react";
 import { Drawer } from "antd";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -8,6 +10,8 @@ import FormField from "./form-field";
 import { updateTreeviewAction } from "./action";
 import toast from "react-hot-toast";
 import { IState } from "./types";
+import { RotateCcw } from "lucide-react";
+import { debounce } from "lodash";
 
 interface dataProps {
   treeviewStateData: IState;
@@ -25,6 +29,8 @@ const FormTreeview: React.FC<dataProps> = ({
       updateTreeview: state.updateTreeview,
     })
   );
+
+  const [submitting, setSubmitting] = useState(false);
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>,
@@ -47,8 +53,10 @@ const FormTreeview: React.FC<dataProps> = ({
     });
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  async function handleSubmit(formData: FormData) {
+    setSubmitting(true);
+
+    console.log(treeviewData);
 
     const response = await updateTreeviewAction(treeviewData);
     if (response?.error) {
@@ -58,7 +66,10 @@ const FormTreeview: React.FC<dataProps> = ({
       updateTreeview({ isSheetOpen: false });
       fetchData();
     }
-  };
+    setSubmitting(false);
+  }
+
+  const debouncedSubmit = useCallback(debounce(handleSubmit, 500), [handleSubmit]);
 
   return (
     <Drawer
@@ -68,13 +79,31 @@ const FormTreeview: React.FC<dataProps> = ({
       open={isSheetOpen}
       footer={
         <div className="flex justify-end gap-x-3">
-          <Button form="treeviewForm" type="submit" variant="create">
-            Save Changes
+          <Button
+            form="treeviewForm"
+            type="submit"
+            variant="create"
+            disabled={submitting}
+          >
+            {submitting && (
+              <span className="flex items-center">
+                <RotateCcw className="mr-2 h-4 w-4 animate-spin" />
+                Saving...
+              </span>
+            )}
+            {!submitting && "Save Changes"}
           </Button>
         </div>
       }
     >
-      <form id="treeviewForm" onSubmit={handleSubmit}>
+      <form
+        id="treeviewForm"
+        //action={handleSubmit}
+        onSubmit={(e) => {
+          e.preventDefault();
+          debouncedSubmit(new FormData(e.currentTarget)); 
+        }}
+      >
         <FormField
           id="name-input"
           label="Name"

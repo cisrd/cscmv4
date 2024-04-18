@@ -32,7 +32,7 @@ const TreeviewWidget: React.FC<TreeviewWidgetProps> = ({
     `}
       onClick={onSelectTreeview}
     >
-      <p className="text-[14px] truncate">{treeview.name}</p>
+      <p className="text-xm font-semibold text-[14px] truncate">{treeview.name}</p>
       <Button
         onClick={() => {
           updateTreeview({
