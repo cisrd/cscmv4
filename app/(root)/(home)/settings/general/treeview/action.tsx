@@ -3,7 +3,7 @@
 import { prisma, Prisma } from "@/lib/prisma";
 import { treeviewSchema } from "./zod.treeview.schema";
 import { revalidatePath } from "next/cache";
-import { toUpper } from "lodash";
+import { TTreeview } from "./types";
 
 function capitalizeFirstLetter(word: string): string {
   return word.charAt(0).toUpperCase() + word.slice(1);
@@ -18,7 +18,10 @@ export const saveTreeviewName = async (
     let errorMessage = "";
     result.error.issues.forEach((issue) => {
       errorMessage +=
-        capitalizeFirstLetter(String(issue.path[0])) + " : " + issue.message + "\n";
+        capitalizeFirstLetter(String(issue.path[0])) +
+        " : " +
+        issue.message +
+        "\n";
     });
     return {
       error: errorMessage,
@@ -32,8 +35,8 @@ export const saveTreeviewName = async (
         parentId: result.data.parentID,
         level: levelNumber,
         isFm: false,
-        adresse: "",
-        projectCode: "",
+        address: "",
+        code: "",
         codeAnalytic: "",
       },
     });
@@ -57,6 +60,45 @@ export const saveTreeviewName = async (
 
     return {
       error: errorMessage,
+    };
+  }
+};
+
+export const updateTreeviewAction = async (treeviewName: any) => {
+  const result = treeviewSchema.safeParse(treeviewName);
+  if (!result.success) {
+    let errorMessage = "";
+
+    result.error.issues.forEach((issue) => {
+      errorMessage =
+        errorMessage + issue.path[0] + " : " + issue.message + "\n";
+    });
+
+    return {
+      error: errorMessage,
+    };
+  }
+
+  const { data } = result;
+  const updateData = {
+    ...data,
+  };
+
+  try {
+    const createdTreeviewRes = await prisma.tTreeview.update({
+      where: {
+        id: treeviewName.id,
+      },
+      data: updateData,
+    });
+    revalidatePath("/settings/general/treeview");
+    return {
+      error: null,
+      data: createdTreeviewRes,
+    };
+  } catch (errorCatch) {
+    return {
+      error: "Error please contact the support!",
     };
   }
 };
