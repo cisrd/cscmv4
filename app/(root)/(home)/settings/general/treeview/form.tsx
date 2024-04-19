@@ -56,8 +56,6 @@ const FormTreeview: React.FC<dataProps> = ({
   async function handleSubmit(formData: FormData) {
     setSubmitting(true);
 
-    console.log(treeviewData);
-
     const response = await updateTreeviewAction(treeviewData);
     if (response?.error) {
       toast.error(response.error);
@@ -69,7 +67,9 @@ const FormTreeview: React.FC<dataProps> = ({
     setSubmitting(false);
   }
 
-  const debouncedSubmit = useCallback(debounce(handleSubmit, 500), [handleSubmit]);
+  const debouncedSubmit = useCallback(debounce(handleSubmit, 500), [
+    handleSubmit,
+  ]);
 
   return (
     <Drawer
@@ -101,7 +101,7 @@ const FormTreeview: React.FC<dataProps> = ({
         //action={handleSubmit}
         onSubmit={(e) => {
           e.preventDefault();
-          debouncedSubmit(new FormData(e.currentTarget)); 
+          debouncedSubmit(new FormData(e.currentTarget));
         }}
       >
         <FormField

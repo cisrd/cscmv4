@@ -1,33 +1,35 @@
 "use client";
 
 import React from "react";
-import SidebarFooter from "../sidebar/sidebar-footer";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { ArrowLeft, BellIcon, Menu, Sun, SunMoon } from "lucide-react";
-import Link from "next/link";
 import { Button } from "../ui/button";
 import CommonBreadcrumbs from "./breadcrumbs";
 import { useTheme } from "next-themes";
 import { UserButton } from "@clerk/nextjs";
+import { interfaceStore } from "@/store/interface";
 
-interface HeaderProps {
-  toggleSidebar: () => void;
-  sidebarVisible: boolean;
-}
+const Header = () => {
+  const { IsSidebarVisible, updateInterface } = interfaceStore(
+    (state: any) => ({
+      IsSidebarVisible: state.interfaceZustand.IsSidebarVisible,
+      updateInterface: state.updateInterface,
+    })
+  );
 
-const Header = ({ toggleSidebar, sidebarVisible }: HeaderProps) => {
+  function toggleSidebarFn() {
+    updateInterface({
+      IsSidebarVisible: !IsSidebarVisible,
+    });
+  }
+
   return (
     <div className="flex items-center h-14 pl-2 justify-between">
       <div className="flex items-center">
-        <div onClick={toggleSidebar} className="cursor-pointer hidden md:block">
-          {sidebarVisible ? (
+        <div
+          onClick={toggleSidebarFn}
+          className="cursor-pointer hidden md:block"
+        >
+          {IsSidebarVisible ? (
             <ArrowLeft className="transform hover:scale-110 transition-transform duration-300 ease-in-out font-extrabold" />
           ) : (
             <Menu className="transform hover:scale-110 transition-transform duration-300 ease-in-out font-extrabold" />
