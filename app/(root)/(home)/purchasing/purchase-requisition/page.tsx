@@ -1,5 +1,6 @@
 import React from "react";
 import HeaderSection from "./header";
+import ProductTable from "./product-table";
 
 const PurchaseRequisition = () => {
   const documentInfo = {
@@ -17,7 +18,10 @@ const PurchaseRequisition = () => {
   return (
     <div className="flex flex-col h-screen overflow-hidden">
       <div className="flex flex-1 bg-white p-3 rounded-s-sm">
-        <HeaderSection {...documentInfo} />
+        <div className="flex flex-col w-full space-y-2">
+          <HeaderSection {...documentInfo} />
+          <ProductTable />
+        </div>
       </div>
     </div>
   );
