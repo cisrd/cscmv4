@@ -311,7 +311,7 @@ const ProductList = () => {
               title="New Item"
               description="Here to cerate a new product"
               buttonTrigger={<SheetTriggerButton />}
-              onSave={() => console.log("Changes saved!")}
+              //onSave={() => console.log("Changes saved!")}
             >
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">

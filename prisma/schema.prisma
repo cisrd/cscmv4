@@ -8,24 +8,41 @@ datasource db {
 }
 
 model TSupplier {
-  id               Int                @id @default(autoincrement())
-  code             String?            @db.VarChar(50)
-  name             String             @db.VarChar(255)
-  address          String?            @db.VarChar(255)
-  email            String?            @db.VarChar(255)
-  phone            String?            @db.VarChar(255)
-  comment          String?            @db.VarChar(250)
-  status           Boolean            @default(false)
-  statusCash       Boolean            @default(false)
-  startDate        DateTime?          @db.Timestamp()
-  endDate          DateTime?          @db.Timestamp()
-  createdBy        String?            @db.VarChar(50)
-  createdAt        DateTime?          @default(now())
-  updatedAt        DateTime?          @updatedAt
-  updatedBy        String?            @db.VarChar(50)
-  TCountry         TCountry?          @relation(fields: [countryId], references: [id])
-  countryId        Int
-  TSupplierContact TSupplierContact[]
+  id                Int                 @id @default(autoincrement())
+  code              String?             @db.VarChar(50)
+  name              String              @db.VarChar(255)
+  address           String?             @db.VarChar(255)
+  email             String?             @db.VarChar(255)
+  phone             String?             @db.VarChar(255)
+  comment           String?             @db.VarChar(250)
+  status            Boolean             @default(false)
+  statusCash        Boolean             @default(false)
+  startDate         DateTime?           @db.Timestamp()
+  endDate           DateTime?           @db.Timestamp()
+  createdBy         String?             @db.VarChar(50)
+  createdAt         DateTime?           @default(now())
+  updatedAt         DateTime?           @updatedAt
+  updatedBy         String?             @db.VarChar(50)
+  TCountry          TCountry?           @relation(fields: [countryId], references: [id])
+  countryId         Int
+  TSupplierContact  TSupplierContact[]
+  TTreeviewSupplier TTreeviewSupplier[]
+}
+
+model TTreeviewSupplier {
+  id                Int                 @id @default(autoincrement())
+  createdBy         String?             @db.VarChar(50)
+  createdAt         DateTime?           @default(now())
+  updatedAt         DateTime?           @updatedAt
+  updatedBy         String?             @db.VarChar(50)
+  TSupplier         TSupplier?          @relation(fields: [supplierId], references: [id])
+  supplierId        Int
+  TTreeview         TTreeview?          @relation(fields: [treeviewId], references: [id])
+  treeviewId        Int
+  comment1          String?
+  comment2          String?
+  status            String              @db.VarChar(50)
+  TDocumentPurchase TDocumentPurchase[]
 }
 
 model TCountry {
@@ -47,7 +64,7 @@ model TSupplierContact {
 }
 
 model TTreeview {
-  id                Int         @id @default(autoincrement())
+  id                Int                 @id @default(autoincrement())
   name              String
   code              String?
   companyName       String?
@@ -56,22 +73,43 @@ model TTreeview {
   address           String?
   parentId          Int?
   level             Int?
-  isFm              Boolean     @default(false)
-  isActivated       Boolean     @default(true)
-  isRemoved         Boolean     @default(false)
-  isSalesCenter     Boolean     @default(false)
-  isTender          Boolean     @default(false)
-  isMenuEnginnering Boolean     @default(false)
+  isFm              Boolean             @default(false)
+  isActivated       Boolean             @default(true)
+  isRemoved         Boolean             @default(false)
+  isSalesCenter     Boolean             @default(false)
+  isTender          Boolean             @default(false)
+  isMenuEnginnering Boolean             @default(false)
   poFooter          String?
   poEmailBody       String?
   poCcEmail         String?
-  codeAnalytic      String?     @db.VarChar(20)
-  createdBy         String?     @db.VarChar(50)
-  createdAt         DateTime?   @default(now())
-  updatedAt         DateTime?   @updatedAt
-  updatedBy         String?     @db.VarChar(50)
-  children          TTreeview[] @relation("TreeviewToTreeview")
-  parent            TTreeview?  @relation("TreeviewToTreeview", fields: [parentId], references: [id])
+  codeAnalytic      String?             @db.VarChar(20)
+  createdBy         String?             @db.VarChar(50)
+  createdAt         DateTime?           @default(now())
+  updatedAt         DateTime?           @updatedAt
+  updatedBy         String?             @db.VarChar(50)
+  children          TTreeview[]         @relation("TreeviewToTreeview")
+  parent            TTreeview?          @relation("TreeviewToTreeview", fields: [parentId], references: [id])
+  TDocumentPurchase TDocumentPurchase[]
+  TTreeviewSupplier TTreeviewSupplier[]
 
   @@unique([name, parentId], name: "unique_name_parentId")
+}
+
+model TDocumentPurchase {
+  id                 Int                @id @default(autoincrement())
+  prefix             String
+  number             String
+  date               DateTime?
+  dateDelivery       DateTime?
+  deliveryPlace      String?
+  comment            String?
+  status             String             @db.VarChar(50)
+  createdBy          String?            @db.VarChar(50)
+  createdAt          DateTime?          @default(now())
+  updatedAt          DateTime?          @updatedAt
+  updatedBy          String?            @db.VarChar(50)
+  TTreeview          TTreeview?         @relation(fields: [treeviewId], references: [id])
+  treeviewId         Int
+  TTreeviewSupplier  TTreeviewSupplier? @relation(fields: [treeviewSupplierId], references: [id])
+  treeviewSupplierId Int
 }

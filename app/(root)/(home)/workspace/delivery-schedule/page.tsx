@@ -1,6 +1,5 @@
 "use client";
 
-import Header from "@/components/interface/header";
 import "@progress/kendo-theme-default/dist/all.css";
 import {
   Scheduler,
