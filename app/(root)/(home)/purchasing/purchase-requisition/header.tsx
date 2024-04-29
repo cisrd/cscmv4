@@ -1,7 +1,8 @@
-// components/Header.tsx
+"use client";
 
 import { Button } from "@/components/ui/button";
-import React from "react";
+import { interfaceStore } from "@/store/interface";
+import React, { useEffect } from "react";
 
 type HeaderProps = {
   documentNumber: string;
@@ -26,6 +27,20 @@ const HeaderSection: React.FC<HeaderProps> = ({
   securityStockDay,
   nbDays,
 }) => {
+
+  const { IsSidebarVisible, updateInterface } = interfaceStore(
+    (state: any) => ({
+      IsSidebarVisible: state.interfaceZustand.IsSidebarVisible,
+      updateInterface: state.updateInterface,
+    })
+  );
+
+  const handleEditPr = () => {
+    updateInterface({
+      IsSidebarVisible: false,
+    });
+  };
+
   return (
     <div
       className="flex w-full max-h-[235px] md:flex-nowrap justify-between
@@ -128,7 +143,8 @@ const HeaderSection: React.FC<HeaderProps> = ({
           </div>
         </div>
         <div className="flex items-center justify-between text-center gap-x-2">
-          <Button variant={"primary"}>Edit PR</Button>
+          <Button type="button" variant={"primary"} onClick= { handleEditPr}>
+            Edit PR</Button>
           <Button variant={"primary"}>Import from Excel</Button>
           <Button variant={"primary"}>Add Product</Button>
         </div>
